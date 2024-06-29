@@ -1,0 +1,39 @@
+FROM ubuntu:latest
+
+# Update the package list
+RUN apt-get update && apt-get autoremove -y
+
+# Environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG BACKEND_PORT
+ENV BACKEND_PORT=$BACKEND_PORT
+
+ARG MONGODB_URI
+ENV MONGODB_URI=$MONGODB_URI
+
+# Install some basic tools
+RUN apt-get install -y nano wget curl git unzip zip
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+RUN apt-get install -y nodejs
+
+# Set the working directory
+COPY . /server
+WORKDIR /server
+
+# Give the entrypoint.sh file the right permissions
+RUN chmod +x /server/entrypoint.sh
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+RUN npm i -g bun
+
+# Expose the port
+EXPOSE ${BACKEND_PORT}
+
+# Install npm-packages & run the app
+ENTRYPOINT ["/server/entrypoint.sh"]
