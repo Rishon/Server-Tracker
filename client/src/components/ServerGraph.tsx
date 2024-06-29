@@ -2,7 +2,7 @@
 import Image from "next/image";
 
 // React
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 // Icons
 import { FaCopy } from "react-icons/fa";
@@ -39,9 +39,16 @@ export default function ServerGraph({
     setNotification(null);
   };
 
+  // Hover state
+  const [hoverX, setHoverX] = useState<number | null>(null);
+  const [hoverData, setHoverData] = useState<{
+    currentPlayers: number;
+    timestamp: number;
+  } | null>(null);
+
   // Path Data
   const pathData = useMemo(() => {
-    const width = pings.length * 10;
+    const width = (maxPlayers == 0 ? 100 : pings.length) * 10;
     const height = 95;
     const maxPingPlayers = Math.max(
       ...pings.map((p) => p.currentPlayers),
@@ -58,6 +65,31 @@ export default function ServerGraph({
 
     return `M0,${height} ${points.join(" ")} ${width},${height} Z`;
   }, [pings, maxPlayers]);
+
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const width = (maxPlayers == 0 ? 100 : pings.length) * 9;
+      const index = Math.round((x / width) * (pings.length - 1));
+      const closestData = pings[index];
+      setHoverX(x);
+      console.log(hoverX);
+      setHoverData(closestData);
+    },
+    [pings]
+  );
+
+  const handleMouseLeave = () => {
+    setHoverX(null);
+    setHoverData(null);
+  };
+
+  const maxPlayersIndex = pings.findIndex(
+    (ping) => ping.currentPlayers === maxPlayers
+  );
+  const maxPlayersX =
+    (maxPlayersIndex / (pings.length - 1)) * (pings.length * 10);
 
   return (
     <div className="items-left justify-center p-4 bg-[#0f0f10] border border-[#2f2f2f] rounded-lg shadow-lg relative">
@@ -96,16 +128,22 @@ export default function ServerGraph({
           <p className="text-md text-gray-500">{ipAddress}</p>
         </div>
       </div>
+
       {/* Graph */}
-      <div className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern">
-        <div className="w-full">
-          <svg className="w-full h-24">
+      <div className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative">
+        <div className="w-full relative">
+          <svg
+            className="w-full h-24"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
             <defs>
               <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="green" stopOpacity="0.5" />
                 <stop offset="100%" stopColor="green" stopOpacity="0" />
               </linearGradient>
             </defs>
+
             <path
               d={pathData}
               fill="url(#gradient)"
@@ -113,9 +151,61 @@ export default function ServerGraph({
               strokeWidth="1"
               fillOpacity="0.5"
             />
+
+            {hoverX !== null && hoverData && (
+              <>
+                <line
+                  x1={hoverX}
+                  y1="0"
+                  x2={hoverX}
+                  y2="100%"
+                  stroke="gray"
+                  strokeDasharray="4"
+                />
+                <rect
+                  x={(hoverX < 200 ? hoverX : hoverX - 190) + 10}
+                  y="5"
+                  width={150 + (name.length * 8) / 2}
+                  height="55"
+                  fill="#0f0f10"
+                  opacity="0.9"
+                  rx="5"
+                  stroke="#2f2f2f"
+                  strokeWidth="0.5"
+                />
+                <text
+                  x={(hoverX < 200 ? hoverX : hoverX - 190) + 20}
+                  y="25"
+                  fill="#c6c6c6"
+                  fontSize="16"
+                  fontFamily="monospace"
+                >
+                  {new Date(hoverData.timestamp).toLocaleString([], {
+                    hour12: false,
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </text>
+                <text
+                  x={(hoverX < 200 ? hoverX : hoverX - 190) + 20}
+                  y="45"
+                  fill="white"
+                  fontSize="14"
+                  fontFamily="monospace"
+                >
+                  <tspan fill="green">◆ </tspan>
+                  <tspan fill="gray">{name}: </tspan>
+                  <tspan fill="#c6c6c6">{hoverData.currentPlayers}</tspan>
+                </text>
+              </>
+            )}
           </svg>
         </div>
       </div>
+
       <div className="text-center mt-4 lg:text-left lg:flex lg:items-center lg:justify-between">
         {/* Players Info */}
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">

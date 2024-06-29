@@ -33,6 +33,8 @@ class StatusChecker {
               image: data.favicon,
               currentPlayers: data.players.now,
             });
+          } else {
+            throw new Error("Server is offline");
           }
         })
         .catch((error) => {
@@ -81,6 +83,7 @@ class StatusChecker {
       const index = serversData.java.findIndex(
         (s) => s.address === server.address
       );
+
       if (index === -1) {
         serversData.java.push(serverData);
       } else {

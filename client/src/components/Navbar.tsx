@@ -1,5 +1,6 @@
 // Next.js
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 // React Icons
@@ -22,7 +23,12 @@ const Navbar = ({ toggleSidebar }: Readonly<{ toggleSidebar: () => void }>) => {
     <nav className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-[#0f0f10] p-4 border-b border-[#2f2f2f]">
       <div className="flex items-center flex-shrink-0 text-white space-x-4">
         <Link href="/" className="font-semibold text-2xl tracking-tight">
-          📈
+          <Image
+            src="/assets/icon.webp"
+            width={25}
+            height={25}
+            alt="Server Tracker"
+          />
         </Link>
         <div className="hidden lg:flex lg:items-center ml-auto space-x-4">
           {links.map((link) => (

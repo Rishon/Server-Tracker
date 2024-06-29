@@ -25,7 +25,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Head>
-        <title>📈 Server Tracker</title>
+        <title>Server Tracker</title>
         <meta name="description" content="Track Israeli minecraft servers" />
         <meta name="author" content="Tracker" />
         <meta name="keywords" content="Tracker, Minecraft, Israel, Servers" />
@@ -33,7 +33,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         <meta name="theme-color" content="#FFFFFF" />
 
         <link rel="canonical" href={domain} />
-        <link rel="icon" href="/assets/icons/favicon.ico" />
+        <link rel="icon" href="/assets/favicon.ico" />
       </Head>
 
       {/* JSON-LD Structured Data */}

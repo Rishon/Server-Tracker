@@ -51,8 +51,9 @@ class MongoService {
     // Update address
     server.address = address;
 
-    if (server.ping.length >= 100)
-      server.ping = server.ping.slice(server.ping.length - 99);
+    // 1440 minutes = 24 hours
+    if (server.ping.length >= 1440)
+      server.ping = server.ping.slice(server.ping.length - 1440);
 
     server.ping.push({
       currentPlayers: currentPlayers,
