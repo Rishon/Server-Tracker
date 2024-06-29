@@ -44,7 +44,6 @@ jobs:
 
             cd /home/Server-Tracker/client && bun install
             echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-            echo "PUBLIC_HOSTNAME=${{ secrets.PUBLIC_HOSTNAME }}" >> .env
 
             bunx next build
 
