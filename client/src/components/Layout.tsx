@@ -26,7 +26,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     <div className="flex flex-col min-h-screen">
       <Head>
         <title>Server Tracker</title>
-        <meta name="description" content="Track Israeli minecraft servers" />
+        <meta name="description" content="Track Israeli Minecraft servers" />
         <meta name="author" content="Tracker" />
         <meta name="keywords" content="Tracker, Minecraft, Israel, Servers" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -51,7 +51,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
               "@type": "Organization",
               name: "Sela Development",
             },
-            description: "Track Israeli minecraft servers",
+            description: "Track Israeli Minecraft servers",
             potentialAction: {
               "@type": "SearchAction",
               target: `https://${domain}/search?q={search_term_string}`,

@@ -220,15 +220,15 @@ export default function ServerGraph({
       <div className="text-center mt-4 lg:text-left lg:flex lg:items-center lg:justify-between">
         {/* Players Info */}
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
-          Current
+          <span className="text-green-500">◆</span> Current
           <p className="text-md text-gray-600">{currentPlayers}</p>
         </div>
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
-          24h Peak
+          <span className="text-cyan-500">◆</span> 24h Peak
           <p className="text-md text-gray-600">{maxPlayers}</p>
         </div>
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
-          Highest Players
+          <span className="text-pink-500">◆</span> All Time
           <p className="text-md text-gray-600">{totalPlayers}</p>
         </div>
       </div>
