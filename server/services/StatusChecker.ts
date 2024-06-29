@@ -34,8 +34,6 @@ class StatusChecker {
               image: data.favicon,
               currentPlayers: data.players.now,
             });
-          } else {
-            throw new Error("Server is offline");
           }
         })
         .catch((error) => {
