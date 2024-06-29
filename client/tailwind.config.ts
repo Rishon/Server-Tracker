@@ -9,9 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "black-gray-dots": "radial-gradient(circle, #282b30 1.9px, #000 1px)",
+        "graph-black-dots": "radial-gradient(ellipse, #000 1.9px, #0f0f10 1px)",
+      },
+      backgroundSize: {
+        "dots-pattern": "20px 30px",
+        "graph-pattern": "20px 20px",
       },
     },
   },

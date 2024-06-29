@@ -1,0 +1,45 @@
+{
+  "java": [
+    {
+      "name": "TopStrix",
+      "address": "play.topstrix.net"
+    },
+    {
+      "name": "Sela Mixers",
+      "address": "play.selamixers.club"
+    },
+    {
+      "name": "Verart",
+      "address": "verart.org"
+    },
+    {
+      "name": "PokeSMP [FORGE]",
+      "address": "pokesmp.net"
+    },
+    {
+      "name": "Parla Games",
+      "address": "parlagames.co.il"
+    },
+    {
+      "name": "XServers",
+      "address": "xservers.xyz"
+    },
+    {
+      "name": "SuperKor",
+      "address": "mc.superkor.net"
+    },
+    {
+      "name": "TigerNetwork",
+      "address": "play.tigeril.online"
+    },
+    {
+      "name": "ScapeCraft",
+      "address": "play.scapecraft.net"
+    },
+    {
+      "name": "Shotist",
+      "address": "play.shotist.net"
+    }
+  ],
+  "bedrock": [{}]
+}
