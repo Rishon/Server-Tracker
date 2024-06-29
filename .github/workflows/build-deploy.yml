@@ -11,6 +11,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      - name: Install bun
+        run: |
+          npm install -g bun
+
       - name: Build web client
         run: |
           cd client && bun install && bun run build
@@ -28,6 +37,7 @@ jobs:
             if [ ! -d "Server-Tracker" ]; then
               gh repo clone Rishon/Server-Tracker
             fi
+
             cd Server-Tracker
             git reset --hard origin/master
             git pull origin
