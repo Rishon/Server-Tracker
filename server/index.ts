@@ -9,6 +9,8 @@ import StatusChecker from "./services/StatusChecker";
 
 // Environment Variables
 const PORT = process.env.BACKEND_PORT || 3005;
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/tracker-db";
 
 // StatusChecker
 const statusChecker = new StatusChecker();
@@ -90,7 +92,7 @@ const server = serve({
 
 async function init() {
   // Connect to MongoDB
-  await MongoDB.connect();
+  await MongoDB.connect(MONGODB_URI);
 
   // StatusChecker
   await statusChecker.fetchServersData();
