@@ -26,6 +26,11 @@ jobs:
 
       - name: Deploy using SSH
         uses: appleboy/ssh-action@master
+        env:
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          PUBLIC_HOSTNAME: ${{ secrets.PUBLIC_HOSTNAME }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -42,18 +47,10 @@ jobs:
             git reset --hard origin/master
             git pull origin
 
-            cd /home/Server-Tracker/client && bun install
-            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-            echo "PUBLIC_HOSTNAME=${{ secrets.PUBLIC_HOSTNAME }}" >> .env
-
-            bunx next build
-
+            cd /home/Server-Tracker/client && bun install && bunx next build
             cd /home/Server-Tracker/server && bun install
-            echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
-            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
 
             cd /home/Server-Tracker
-
             docker build ./client -t tracker-web
             docker build ./server -t tracker-server
 
