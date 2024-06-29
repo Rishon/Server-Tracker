@@ -2,6 +2,9 @@
 import Head from "next/head";
 import Script from "next/script";
 
+// Analytics
+import { GoogleAnalytics } from "@next/third-parties/google";
+
 // Components
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -64,6 +67,9 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         {children}
         <Footer />
       </main>
+
+      {/* Google Analytics */}
+      <GoogleAnalytics gaId={`G-08RW5HWFEH`} />
     </div>
   );
 };

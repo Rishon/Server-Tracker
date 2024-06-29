@@ -42,6 +42,7 @@ class StatusChecker {
   }
 
   public async fetchServersData() {
+    let startTime = new Date().getTime();
     console.log("Fetching servers data...");
 
     await MongoDB.removeInvalidServers(serversList.java);
@@ -87,7 +88,8 @@ class StatusChecker {
       }
     }
 
-    console.log("Servers data fetched!");
+    let endTime = new Date().getTime();
+    console.log(`Fetched servers data in ${endTime - startTime}ms`);
   }
 
   public getServersData() {

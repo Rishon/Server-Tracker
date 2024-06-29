@@ -7,8 +7,6 @@ import ServerModel from "../models/ServerModel";
 class MongoService {
   // Connect to MongoDB
   static async connect(uri: string) {
-    console.log(`Connecting to MongoDB at ${uri}`);
-
     const options = {
       dbName: "tracker-db",
     } as mongoose.ConnectOptions;

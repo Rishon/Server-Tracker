@@ -2,10 +2,13 @@
 import Image from "next/image";
 
 // React
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // Icons
 import { FaCopy } from "react-icons/fa";
+
+// Components
+import Snackbar from "@/components/Snackbar";
 
 export default function ServerGraph({
   image,
@@ -24,6 +27,18 @@ export default function ServerGraph({
   totalPlayers: number;
   pings: Array<{ currentPlayers: number; timestamp: number }>;
 }>) {
+  // Snackbar
+  const [notification, setNotification] = useState<string | null>(null);
+  const [snackbarType, setSnackbarType] = useState<"success" | "error">(
+    "success"
+  );
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  const closeSnackbar = () => {
+    setShowSnackbar(false);
+    setNotification(null);
+  };
+
   // Path Data
   const pathData = useMemo(() => {
     const width = pings.length * 10;
@@ -46,6 +61,13 @@ export default function ServerGraph({
 
   return (
     <div className="items-left justify-center p-4 bg-[#0f0f10] border border-[#2f2f2f] rounded-lg shadow-lg relative">
+      {showSnackbar && (
+        <Snackbar
+          message={notification || ""}
+          type={snackbarType}
+          onClose={closeSnackbar}
+        />
+      )}
       <div className="flex items-center border-b border-[#2f2f2f] pb-4">
         {/* Server Address and Image */}
         <Image
@@ -61,6 +83,9 @@ export default function ServerGraph({
           hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
           onClick={() => {
             navigator.clipboard.writeText(ipAddress);
+            setNotification("Copied to clipboard!");
+            setSnackbarType("success");
+            setShowSnackbar(true);
           }}
         >
           <FaCopy />
@@ -98,11 +123,11 @@ export default function ServerGraph({
           <p className="text-md text-gray-600">{currentPlayers}</p>
         </div>
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
-          Max
+          24h Peak
           <p className="text-md text-gray-600">{maxPlayers}</p>
         </div>
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
-          Highest Count
+          Highest Players
           <p className="text-md text-gray-600">{totalPlayers}</p>
         </div>
       </div>

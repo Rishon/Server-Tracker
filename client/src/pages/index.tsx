@@ -3,21 +3,26 @@ import Layout from "@/components/Layout";
 import ServerGraph from "@/components/ServerGraph";
 import { useEffect, useState } from "react";
 
-export default function Home() {
-  const initialServerData = {
-    name: "",
-    address: "",
-    platform: "",
-    currentPlayers: 0,
-    image: "",
-    maxPlayers: 0,
-    totalPlayers: 0,
-    pings: [],
-  };
+type ServerData = {
+  name: string;
+  address: string;
+  platform: string;
+  currentPlayers: number;
+  image: string;
+  maxPlayers: number;
+  totalPlayers: number;
+  pings: any[];
+};
 
-  const [serversData, setServersData] = useState({
-    java: [{ ...initialServerData }],
-    bedrock: [{ ...initialServerData }],
+type ServersData = {
+  java: ServerData[];
+  bedrock: ServerData[];
+};
+
+export default function Home() {
+  const [serversData, setServersData] = useState<ServersData>({
+    java: [],
+    bedrock: [],
   });
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <main className="items-center pt-16 pb-12 ml-4 lg:ml-64">
+      <main className="items-center pt-16 pb-24 ml-4 lg:ml-64">
         <div className="rounded-lg shadow-lg p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {serversData.java
             .sort((a, b) => b.currentPlayers - a.currentPlayers)
