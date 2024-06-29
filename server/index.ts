@@ -98,13 +98,13 @@ async function init() {
   // Connect to MongoDB
   await MongoDB.connect(MONGODB_URL);
 
-  // StatusChecker
-  await statusChecker.fetchServersData();
-
   // Update every minute the servers
   setInterval(async () => {
     await statusChecker.fetchServersData();
   }, 1000 * 30);
+
+  // StatusChecker on time
+  await statusChecker.fetchServersData();
 }
 
 init();

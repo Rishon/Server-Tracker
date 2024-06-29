@@ -53,6 +53,7 @@ export default function Home() {
         <div className="rounded-lg shadow-lg p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {serversData.java
             .sort((a, b) => b.currentPlayers - a.currentPlayers)
+            .filter((server) => server.name !== "")
             .map((server, index) => (
               <ServerGraph
                 key={index}
