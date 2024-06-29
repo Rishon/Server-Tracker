@@ -31,32 +31,32 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
         <link rel="canonical" href={domain} />
         <link rel="icon" href="/assets/icons/favicon.ico" />
-
-        {/* JSON-LD Structured Data */}
-        <Script
-          id="json-ld"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              url: domain,
-              name: "Tracker",
-              author: {
-                "@type": "Organization",
-                name: "Sela Development",
-              },
-              description: "Track Israeli minecraft servers",
-              potentialAction: {
-                "@type": "SearchAction",
-                target: `https://${domain}/search?q={search_term_string}`,
-                "query-input": "required name=search_term_string",
-              },
-            }),
-          }}
-        />
       </Head>
+
+      {/* JSON-LD Structured Data */}
+      <Script
+        id="json-ld"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            url: domain,
+            name: "Tracker",
+            author: {
+              "@type": "Organization",
+              name: "Sela Development",
+            },
+            description: "Track Israeli minecraft servers",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `https://${domain}/search?q={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
 
       <main className="bg-black-gray-dots bg-dots-pattern min-h-screen">
         <Navbar toggleSidebar={toggleSidebar} />
