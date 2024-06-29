@@ -1,13 +1,6 @@
-// Next.js
 import Image from "next/image";
-
-// React
-import { useMemo, useState, useCallback } from "react";
-
-// Icons
+import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { FaCopy } from "react-icons/fa";
-
-// Components
 import Snackbar from "@/components/Snackbar";
 
 export default function ServerGraph({
@@ -27,6 +20,8 @@ export default function ServerGraph({
   totalPlayers: number;
   pings: Array<{ currentPlayers: number; timestamp: number }>;
 }>) {
+  const maxPings = 1440;
+
   // Snackbar
   const [notification, setNotification] = useState<string | null>(null);
   const [snackbarType, setSnackbarType] = useState<"success" | "error">(
@@ -46,50 +41,64 @@ export default function ServerGraph({
     timestamp: number;
   } | null>(null);
 
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+  const [maxGraphWidth, setMaxGraphWidth] = useState(300);
+
+  useEffect(() => {
+    const updateMaxGraphWidth = () => {
+      if (graphContainerRef.current) {
+        setMaxGraphWidth(graphContainerRef.current.offsetWidth);
+      }
+    };
+
+    updateMaxGraphWidth();
+    window.addEventListener("resize", updateMaxGraphWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateMaxGraphWidth);
+    };
+  }, []);
+
   // Path Data
   const pathData = useMemo(() => {
-    const width = maxPlayers == 0 ? 100 * 5 : pings.length;
+    const width = Math.min(pings.length, maxPings);
+    const dynamicWidth = (width / maxPings) * maxGraphWidth;
     const height = 95;
     const maxPingPlayers = Math.max(
       ...pings.map((p) => p.currentPlayers),
       maxPlayers
     );
 
-    if (maxPingPlayers === 0) return `M0,${height} ${width},${height} Z`;
+    if (maxPingPlayers === 0) return `M0,${height} ${dynamicWidth},${height} Z`;
 
-    const points = pings.map((ping, index) => {
-      const x = (index / (pings.length - 1)) * width;
+    const points = pings.slice(0, width).map((ping, index) => {
+      const x = (index / (width - 1)) * dynamicWidth;
       const y = height - (ping.currentPlayers / maxPingPlayers) * height;
       return `${x},${y}`;
     });
 
-    return `M0,${height} ${points.join(" ")} ${width},${height} Z`;
-  }, [pings, maxPlayers]);
+    return `M0,${height} ${points.join(" ")} ${dynamicWidth},${height} Z`;
+  }, [pings, maxPlayers, maxGraphWidth]);
 
+  // Mouse Move
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
       const rect = event.currentTarget.getBoundingClientRect();
       const x = event.clientX - rect.left;
-      const width = maxPlayers == 0 ? 100 * 5 : pings.length;
-      const index = Math.round((x / width) * (pings.length - 1));
+      const width = Math.min(pings.length, maxPings);
+      const dynamicWidth = (width / maxPings) * maxGraphWidth;
+      const index = Math.round((x / dynamicWidth) * (width - 1));
       const closestData = pings[index];
       setHoverX(x);
-      console.log(hoverX);
       setHoverData(closestData);
     },
-    [pings]
+    [pings, maxGraphWidth]
   );
 
   const handleMouseLeave = () => {
     setHoverX(null);
     setHoverData(null);
   };
-
-  const maxPlayersIndex = pings.findIndex(
-    (ping) => ping.currentPlayers === maxPlayers
-  );
-  const maxPlayersX =
-    (maxPlayersIndex / (pings.length - 1)) * (pings.length * 10);
 
   return (
     <div className="items-left justify-center p-4 bg-[#0f0f10] border border-[#2f2f2f] rounded-lg shadow-lg relative">
@@ -111,8 +120,7 @@ export default function ServerGraph({
         />
         {/* Copy button */}
         <button
-          className="absolute right-4 top-4 text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-3
-          hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
+          className="absolute right-4 top-4 text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
           onClick={() => {
             navigator.clipboard.writeText(ipAddress);
             setNotification("Copied to clipboard!");
@@ -130,7 +138,10 @@ export default function ServerGraph({
       </div>
 
       {/* Graph */}
-      <div className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative">
+      <div
+        ref={graphContainerRef}
+        className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative"
+      >
         <div className="w-full relative">
           <svg
             className="w-full h-24"

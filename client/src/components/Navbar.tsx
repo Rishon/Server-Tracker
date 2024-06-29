@@ -30,7 +30,7 @@ const Navbar = ({ toggleSidebar }: Readonly<{ toggleSidebar: () => void }>) => {
             alt="Server Tracker"
           />
         </Link>
-        <div className="hidden lg:flex lg:items-center ml-auto space-x-4">
+        <div className="flex lg:flex lg:items-center ml-auto space-x-4">
           {links.map((link) => (
             <Link key={link.path} href={link.path} target={link.target}>
               <p
@@ -46,11 +46,11 @@ const Navbar = ({ toggleSidebar }: Readonly<{ toggleSidebar: () => void }>) => {
           ))}
         </div>
       </div>
-      <div className="block lg:hidden">
+      {/* <div className="block lg:hidden">
         <button onClick={toggleSidebar} className="text-white text-xl">
           <FaBars />
         </button>
-      </div>
+      </div> */}
     </nav>
   );
 };

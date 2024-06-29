@@ -51,14 +51,14 @@ class MongoService {
     // Update address
     server.address = address;
 
-    // 1440 minutes = 24 hours
-    if (server.ping.length > 1440)
-      server.ping = server.ping.slice(server.ping.length - 1440);
-
     server.ping.push({
       currentPlayers: currentPlayers,
       timestamp: currentDateTime,
     });
+
+    // 1440 minutes = 24 hours
+    if (server.ping.length > 1440)
+      server.ping = server.ping.slice(server.ping.length - 1440);
 
     // Update server image
     server.image = image;

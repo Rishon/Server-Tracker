@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <main className="items-center pt-16 pb-24 ml-4 lg:ml-64">
+      <main className="items-center pt-16 pb-24 ml-4">
         <div className="rounded-lg shadow-lg p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {serversData.java
             .sort((a, b) => b.currentPlayers - a.currentPlayers)

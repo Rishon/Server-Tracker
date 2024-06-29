@@ -63,7 +63,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
       <main className="bg-black-gray-dots bg-dots-pattern min-h-screen">
         <Navbar toggleSidebar={toggleSidebar} />
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+        {/* <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} /> */}
         {children}
         <Footer />
       </main>
