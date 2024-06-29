@@ -55,7 +55,7 @@ Highly recommended to install [Bun](https://bun.sh/) for the package management.
 
    ```yml
    BACKEND_PORT=<Port>
-   MONGODB_URI=<MongoDB URI>
+   MONGODB_URL=<MongoDB URI>
    ```
 
 7. Start the development server:
