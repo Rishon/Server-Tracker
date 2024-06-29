@@ -50,7 +50,7 @@ jobs:
 
             cd /home/Server-Tracker/server && bun install
             echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
-            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+            echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> .env
 
             cd /home/Server-Tracker
 
