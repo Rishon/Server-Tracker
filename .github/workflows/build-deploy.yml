@@ -39,8 +39,8 @@ jobs:
 
             cd /home/Server-Tracker
 
-            docker build ./client -t Server-Tracker
-            docker build ./server -t licht-server
+            docker build ./client -t tracker-web
+            docker build ./server -t tracker-server
 
             docker container prune --force
             docker image prune --force
