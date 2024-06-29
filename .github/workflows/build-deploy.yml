@@ -29,13 +29,13 @@ jobs:
             git pull origin
 
             cd /home/Server-Tracker/client && bun install
-            echo "FRONTEND_PORT=${{ vars.FRONTEND_PORT }}" >> .env
-            echo "PUBLIC_HOSTNAME=${{ vars.PUBLIC_HOSTNAME }}" >> .env
-            
+            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
+            echo "PUBLIC_HOSTNAME=${{ secrets.PUBLIC_HOSTNAME }}" >> .env
+
             bunx next build
 
             cd /home/Server-Tracker/server && bun install
-            echo "BACKEND_PORT=${{ vars.BACKEND_PORT }}" > .env
+            echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
             echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
 
             cd /home/Server-Tracker
