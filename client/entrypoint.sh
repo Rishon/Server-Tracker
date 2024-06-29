@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FRONTEND_PORT="${FRONTEND_PORT:-3001}"
+FRONTEND_PORT="${FRONTEND_PORT:-3006}"
 
 ~/.bun/bin/bun install
 ~/.bun/bin/bun next telemetry disable

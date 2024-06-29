@@ -8,10 +8,12 @@ import ResponseHandler from "./handler/ResponseHandler";
 import StatusChecker from "./services/StatusChecker";
 
 // Environment Variables
-const PORT = process.env.BACKEND_PORT || 3002;
+const PORT = process.env.BACKEND_PORT || 3005;
 
 // StatusChecker
 const statusChecker = new StatusChecker();
+
+console.log(PORT)
 
 const server = serve({
   hostname: "0.0.0.0",
