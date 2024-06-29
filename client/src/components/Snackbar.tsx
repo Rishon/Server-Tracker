@@ -11,28 +11,22 @@ const Snackbar: React.FC<SnackbarProps> = ({ message, type, onClose }) => {
 
   useEffect(() => {
     setIsVisible(true);
-    const timer = setTimeout(() => {
-      handleClose();
+
+    const closeTimeout = setTimeout(() => {
+      setIsVisible(false);
+      const removeTimeout = setTimeout(onClose, 500);
+      return () => clearTimeout(removeTimeout);
     }, 3000);
 
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 500);
-  };
+    return () => clearTimeout(closeTimeout);
+  }, [onClose]);
 
   return (
     <div
-      className={`fixed bottom-5 right-5 p-4 rounded-md z-50 transition-transform transition-opacity duration-500 ${
+      className={`fixed bottom-5 right-5 p-4 rounded-md z-50 transition-all duration-500 ease-in-out transform ${
         isVisible
-          ? "opacity-100 transform"
-          : "opacity-0 transform pointer-events-none"
+          ? "opacity-100 translate-x-0"
+          : "opacity-0 translate-x-5 pointer-events-none"
       } ${type === "success" ? "bg-green-500" : "bg-red-500"}`}
     >
       <div className="text-white">{message}</div>

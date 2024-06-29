@@ -1,6 +1,13 @@
+// Next.js
 import Image from "next/image";
+
+// React
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
+
+// Icons
 import { FaCopy } from "react-icons/fa";
+
+// Components
 import Snackbar from "@/components/Snackbar";
 
 export default function ServerGraph({
@@ -217,7 +224,7 @@ export default function ServerGraph({
         </div>
       </div>
 
-      <div className="text-center mt-4 lg:text-left lg:flex lg:items-center lg:justify-between">
+      <div className="text-center mt-4 lg:text-left lg:flex lg:justify-between">
         {/* Players Info */}
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
           <span className="text-green-500">◆</span> Current
