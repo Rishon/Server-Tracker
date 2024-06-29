@@ -4,10 +4,6 @@ import mongoose from "mongoose";
 // Models
 import ServerModel from "../models/ServerModel";
 
-// Dotenv
-import dotenv from "dotenv";
-dotenv.config();
-
 class MongoService {
   // Connect to MongoDB
   static async connect(uri: string) {

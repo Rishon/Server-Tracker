@@ -7,10 +7,14 @@ import MongoDB from "./services/MongoDB";
 import ResponseHandler from "./handler/ResponseHandler";
 import StatusChecker from "./services/StatusChecker";
 
+// Dotenv
+import dotenv from "dotenv";
+dotenv.config();
+
 // Environment Variables
 const PORT = process.env.BACKEND_PORT || 3005;
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/tracker-db";
+const MONGODB_URL =
+  process.env.MONGODB_URL || "mongodb://localhost:27017/tracker-db";
 
 // StatusChecker
 const statusChecker = new StatusChecker();
@@ -92,7 +96,7 @@ const server = serve({
 
 async function init() {
   // Connect to MongoDB
-  await MongoDB.connect(MONGODB_URI);
+  await MongoDB.connect(MONGODB_URL);
 
   // StatusChecker
   await statusChecker.fetchServersData();
