@@ -1,0 +1,48 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy using SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home
+
+            if [ ! -d "Server-Tracker" ]; then
+              gh repo clone Rishon/Server-Tracker
+            fi
+            cd Server-Tracker
+            git reset --hard origin/master
+            git pull origin
+
+            cd /home/Server-Tracker/client && bun install
+            bunx next build
+
+            cd /home/Server-Tracker/server && bun install
+            echo "BACKEND_PORT=${{ vars.BACKEND_PORT }}" > .env
+            echo "FRONTEND_PORT=${{ vars.FRONTEND_PORT }}" >> .env
+            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+            echo "PUBLIC_HOSTNAME=${{ vars.PUBLIC_HOSTNAME }}" >> .env
+
+            cd /home/Server-Tracker
+
+            docker build ./client -t Server-Tracker
+            docker build ./server -t licht-server
+
+            docker container prune --force
+            docker image prune --force
+
+            docker compose up -d

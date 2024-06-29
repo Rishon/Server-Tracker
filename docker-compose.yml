@@ -1,0 +1,12 @@
+services:
+  tracker-web:
+    image: tracker-web
+    container_name: tracker-web
+    restart: unless-stopped
+    network_mode: host
+
+  tracker-server:
+    image: tracker-server
+    container_name: tracker-server
+    restart: unless-stopped
+    network_mode: host
