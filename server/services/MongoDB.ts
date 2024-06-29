@@ -8,6 +8,7 @@ class MongoService {
   // Connect to MongoDB
   static async connect() {
     const uri = process.env.MONGODB_URI as string;
+    console.log(`Connecting to MongoDB at ${uri}`);
 
     const options = {
       dbName: "tracker-db",

@@ -13,8 +13,6 @@ const PORT = process.env.BACKEND_PORT || 3005;
 // StatusChecker
 const statusChecker = new StatusChecker();
 
-console.log(PORT)
-
 const server = serve({
   hostname: "0.0.0.0",
   port: PORT,

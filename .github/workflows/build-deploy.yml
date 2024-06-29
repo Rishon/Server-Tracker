@@ -11,6 +11,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Build web client
+        run: |
+          cd client && bun install && bun run build
+
       - name: Deploy using SSH
         uses: appleboy/ssh-action@master
         with:

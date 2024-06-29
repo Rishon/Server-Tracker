@@ -12,7 +12,7 @@ const Navbar = ({ toggleSidebar }: Readonly<{ toggleSidebar: () => void }>) => {
   const links = [
     { path: "/", label: "Home" },
     {
-      path: "https://github.com/Rishon/Tracker",
+      path: "https://github.com/Rishon/Server-Tracker",
       label: "Suggest Server",
       target: "_blank",
     },
