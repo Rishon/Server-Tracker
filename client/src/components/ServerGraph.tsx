@@ -48,7 +48,7 @@ export default function ServerGraph({
 
   // Path Data
   const pathData = useMemo(() => {
-    const width = (maxPlayers == 0 ? 100 : pings.length) * 10;
+    const width = maxPlayers == 0 ? 100 * 5 : pings.length;
     const height = 95;
     const maxPingPlayers = Math.max(
       ...pings.map((p) => p.currentPlayers),
@@ -70,7 +70,7 @@ export default function ServerGraph({
     (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
       const rect = event.currentTarget.getBoundingClientRect();
       const x = event.clientX - rect.left;
-      const width = (maxPlayers == 0 ? 100 : pings.length) * 9;
+      const width = maxPlayers == 0 ? 100 * 5 : pings.length;
       const index = Math.round((x / width) * (pings.length - 1));
       const closestData = pings[index];
       setHoverX(x);

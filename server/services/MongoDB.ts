@@ -52,7 +52,7 @@ class MongoService {
     server.address = address;
 
     // 1440 minutes = 24 hours
-    if (server.ping.length >= 1440)
+    if (server.ping.length > 1440)
       server.ping = server.ping.slice(server.ping.length - 1440);
 
     server.ping.push({
