@@ -9,9 +9,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG BACKEND_PORT
 ENV BACKEND_PORT=$BACKEND_PORT
 
-ARG MONGODB_URI
-ENV MONGODB_URI=$MONGODB_URI
-
 # Install some basic tools
 RUN apt-get install -y nano wget curl git unzip zip
 
