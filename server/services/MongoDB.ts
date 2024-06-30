@@ -65,11 +65,15 @@ class MongoService {
 
     // Update max players based on last 24 hours pings
     if (server.maxPlayers === undefined) server.maxPlayers = 0;
+
+    let currentMaxPlayers = 0 as Number;
+
     server.ping.forEach((ping) => {
-      if (server == undefined) return;
-      if (ping.currentPlayers > server.maxPlayers)
-        server.maxPlayers = ping.currentPlayers;
+      if (ping.currentPlayers > currentMaxPlayers)
+        currentMaxPlayers = ping.currentPlayers;
     });
+
+    server.maxPlayers = currentMaxPlayers;
 
     // Update total players
     if (server.totalPlayers === undefined) server.totalPlayers = 0;
