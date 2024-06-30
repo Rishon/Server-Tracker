@@ -64,6 +64,7 @@ export default function Home() {
                 maxPlayers={server.maxPlayers}
                 totalPlayers={server.totalPlayers}
                 pings={server.pings}
+                graphColor="#32d67a"
               />
             ))}
         </div>

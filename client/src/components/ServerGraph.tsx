@@ -18,6 +18,7 @@ export default function ServerGraph({
   maxPlayers,
   totalPlayers,
   pings,
+  graphColor,
 }: Readonly<{
   image: string;
   name: string;
@@ -26,6 +27,7 @@ export default function ServerGraph({
   maxPlayers: number;
   totalPlayers: number;
   pings: Array<{ currentPlayers: number; timestamp: number }>;
+  graphColor: string;
 }>) {
   const maxPings = 1440;
 
@@ -117,7 +119,6 @@ export default function ServerGraph({
         />
       )}
       <div className="flex items-center border-b border-[#2f2f2f] pb-4">
-        {/* Server Address and Image */}
         <Image
           src={image}
           width={50}
@@ -125,7 +126,6 @@ export default function ServerGraph({
           alt={name}
           className="rounded-lg"
         />
-        {/* Copy button */}
         <button
           className="absolute right-4 top-4 text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
           onClick={() => {
@@ -144,7 +144,6 @@ export default function ServerGraph({
         </div>
       </div>
 
-      {/* Graph */}
       <div
         ref={graphContainerRef}
         className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative"
@@ -157,15 +156,15 @@ export default function ServerGraph({
           >
             <defs>
               <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="green" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="green" stopOpacity="0" />
+                <stop offset="0%" stopColor={graphColor} stopOpacity="0.5" />
+                <stop offset="100%" stopColor={graphColor} stopOpacity="0" />
               </linearGradient>
             </defs>
 
             <path
               d={pathData}
               fill="url(#gradient)"
-              stroke="green"
+              stroke={graphColor}
               strokeWidth="1"
               fillOpacity="0.5"
             />
@@ -214,7 +213,7 @@ export default function ServerGraph({
                   fontSize="14"
                   fontFamily="monospace"
                 >
-                  <tspan fill="green">◆ </tspan>
+                  <tspan fill={graphColor}>◆ </tspan>
                   <tspan fill="gray">{name}: </tspan>
                   <tspan fill="#c6c6c6">{hoverData.currentPlayers}</tspan>
                 </text>
@@ -225,7 +224,6 @@ export default function ServerGraph({
       </div>
 
       <div className="text-center mt-4 lg:text-left lg:flex lg:justify-between">
-        {/* Players Info */}
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
           <span className="text-green-500">◆</span> Current
           <p className="text-md text-gray-600">{currentPlayers}</p>
