@@ -63,21 +63,13 @@ class MongoService {
     // Update server image
     server.image = image;
 
-    // Update server currentDateTime if not exist
-    if (server.currentDateTime === undefined)
-      server.currentDateTime = currentDateTime;
-
-    // Update today's max players, if date is passed 24 hours, reset it
-    if (
-      Number(currentDateTime) - Number(server.currentDateTime) >
-      24 * 60 * 60 * 1000
-    ) {
-      server.currentDateTime = currentDateTime;
-      server.maxPlayers = currentPlayers;
-    }
-
+    // Update max players based on last 24 hours pings
     if (server.maxPlayers === undefined) server.maxPlayers = 0;
-    if (currentPlayers > server.maxPlayers) server.maxPlayers = currentPlayers;
+    server.ping.forEach((ping) => {
+      if (server == undefined) return;
+      if (ping.currentPlayers > server.maxPlayers)
+        server.maxPlayers = ping.currentPlayers;
+    });
 
     // Update total players
     if (server.totalPlayers === undefined) server.totalPlayers = 0;
@@ -105,7 +97,10 @@ class MongoService {
     });
 
     // If server not found, ping it
-    if (!server) this.pingServer(name, "", 0, "");
+    if (!server) {
+      await this.pingServer(name, "", 0, "");
+      return;
+    }
     return server;
   }
 }
