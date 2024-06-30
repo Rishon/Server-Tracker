@@ -1,9 +1,11 @@
 // Servers.json data
-import { resolve } from "bun";
 import serversList from "../servers.json";
 
 // Services
 import MongoDB from "./MongoDB";
+
+// Query
+import { ping } from "minecraft-server-ping";
 
 interface ServerData {
   currentPlayers: Number;
@@ -22,27 +24,22 @@ const serversData: { java: ServerInfo[]; bedrock: ServerInfo[] } = {
 };
 
 class StatusChecker {
-  private async getServerInfo(address: String): Promise<ServerData> {
-    return new Promise((resolve) => {
-      fetch(`https://mcapi.us/server/status?ip=${address}&port=25565`)
-        .then((response) => {
-          return response.json();
-        })
+  private async getServerInfo(address: string): Promise<ServerData> {
+    return new Promise(async (resolve) => {
+      await ping(() => Promise.resolve({ hostname: address, port: 25565 }), {
+        timeout: 5000,
+      })
         .then((data) => {
-          if (data.online) {
-            resolve({
-              image: data.favicon,
-              currentPlayers: data.players.now,
-            });
-          } else {
-            resolve({
-              image: "",
-              currentPlayers: 0,
-            });
-          }
+          resolve({
+            image: data.favicon || "",
+            currentPlayers: data.players.online,
+          });
         })
-        .catch((error) => {
-          console.error("Error fetching player count", error);
+        .catch(() => {
+          resolve({
+            image: "",
+            currentPlayers: 0,
+          });
         });
     });
   }
