@@ -104,12 +104,30 @@ export default function ServerGraph({
     [pings, maxGraphWidth]
   );
 
+  // Calculate peak player position
+  const calculatePeakPlayerPosition = (
+    pings: Array<{ currentPlayers: number; timestamp: number }>,
+    maxPlayers: number,
+    maxGraphWidth: number
+  ) => {
+    const peakIndex = pings.findIndex(
+      (ping: any) => ping.currentPlayers === maxPlayers
+    );
+    if (peakIndex !== -1) {
+      const width = Math.min(pings.length, maxPings);
+      const dynamicWidth = (width / maxPings) * maxGraphWidth;
+      return (peakIndex / (width - 1)) * dynamicWidth;
+    }
+    return 0;
+  };
+
   const handleMouseLeave = () => {
     setHoverX(null);
     setHoverData(null);
   };
 
   return (
+    // Snack bar
     <div className="items-left justify-center p-4 bg-[#0f0f10] border border-[#2f2f2f] rounded-lg shadow-lg relative">
       {showSnackbar && (
         <Snackbar
@@ -118,6 +136,8 @@ export default function ServerGraph({
           onClose={closeSnackbar}
         />
       )}
+
+      {/* Server Info */}
       <div className="flex items-center border-b border-[#2f2f2f] pb-4">
         <Image
           src={image}
@@ -144,6 +164,7 @@ export default function ServerGraph({
         </div>
       </div>
 
+      {/* Graph */}
       <div
         ref={graphContainerRef}
         className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative"
@@ -161,6 +182,7 @@ export default function ServerGraph({
               </linearGradient>
             </defs>
 
+            {/* Path for the graph */}
             <path
               d={pathData}
               fill="url(#gradient)"
@@ -169,6 +191,28 @@ export default function ServerGraph({
               fillOpacity="0.5"
             />
 
+            {/* Line for 24h peak players */}
+            {pings.length > 0 && maxPlayers > 0 && (
+              <line
+                x1={calculatePeakPlayerPosition(
+                  pings,
+                  maxPlayers,
+                  maxGraphWidth
+                )}
+                y1="0"
+                x2={calculatePeakPlayerPosition(
+                  pings,
+                  maxPlayers,
+                  maxGraphWidth
+                )}
+                y2="100%"
+                stroke="#d13e1d"
+                strokeWidth="2"
+                strokeDasharray="4"
+              />
+            )}
+
+            {/* Hover elements */}
             {hoverX !== null && hoverData && (
               <>
                 <line
@@ -223,6 +267,7 @@ export default function ServerGraph({
         </div>
       </div>
 
+      {/* Player Count */}
       <div className="text-center mt-4 lg:text-left lg:flex lg:justify-between">
         <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
           <span className="text-green-500">◆</span> Current
