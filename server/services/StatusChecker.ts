@@ -34,6 +34,11 @@ class StatusChecker {
               image: data.favicon,
               currentPlayers: data.players.now,
             });
+          } else {
+            resolve({
+              image: "",
+              currentPlayers: 0,
+            });
           }
         })
         .catch((error) => {
@@ -51,7 +56,7 @@ class StatusChecker {
     for (const server of serversList.java) {
       const info = await this.getServerInfo(server.address);
 
-      if (!info) {
+      if (!info || info.image === "") {
         console.error(`Error fetching server info for ${server.name}`);
         continue;
       }
