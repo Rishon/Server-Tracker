@@ -39,6 +39,10 @@
     {
       "name": "Shotist",
       "address": "play.shotist.net"
+    },
+    {
+      "name": "LoverCraft",
+      "address": "play.loverfella.com"
     }
   ],
   "bedrock": [{}]
