@@ -6,7 +6,7 @@
     },
     {
       "name": "Sela Mixers",
-      "address": "play.selamixers.club"
+      "address": "play.rishon.systems"
     },
     {
       "name": "Verart",
@@ -43,6 +43,10 @@
     {
       "name": "LoverCraft",
       "address": "play.loverfella.com"
+    },
+    {
+      "name": "BenderIL",
+      "address": "benderil.com"
     }
   ],
   "bedrock": [{}]
