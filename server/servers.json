@@ -47,6 +47,10 @@
     {
       "name": "BenderIL",
       "address": "benderil.com"
+    },
+    {
+      "name": "Israel Practice",
+      "address": "play.israelpractice.net"
     }
   ],
   "bedrock": [{}]
