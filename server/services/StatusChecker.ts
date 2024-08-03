@@ -76,7 +76,7 @@ class StatusChecker {
         image
       );
 
-      const mongoServer = await MongoDB.getServerData(server.name);
+      const mongoServer = await MongoDB.getServerData(server.name, server.address);
       if (!mongoServer) {
         console.error(`Server ${server.name} not found in the database.`);
         continue;

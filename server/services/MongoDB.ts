@@ -28,7 +28,7 @@ class MongoService {
     currentPlayers: Number,
     image: String
   ) {
-    var server = await ServerModel.findOne({ name: name });
+    var server = await ServerModel.findOne({ address: address });
     let currentDateTime = new Date().getTime() as Number;
 
     if (!server) {
@@ -95,9 +95,9 @@ class MongoService {
   }
 
   // Get server data
-  static async getServerData(name: String) {
+  static async getServerData(name: String, address: String) {
     const server = await ServerModel.findOne({
-      name: name,
+      address: address,
     });
 
     // If server not found, ping it
