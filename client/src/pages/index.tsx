@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 type ServerData = {
   name: string;
   address: string;
+  port: number;
   platform: string;
   currentPlayers: number;
   image: string;
@@ -60,6 +61,7 @@ export default function Home() {
                 image={server.image}
                 name={server.name}
                 ipAddress={server.address}
+                port={server.port}
                 currentPlayers={server.currentPlayers}
                 maxPlayers={server.maxPlayers}
                 totalPlayers={server.totalPlayers}

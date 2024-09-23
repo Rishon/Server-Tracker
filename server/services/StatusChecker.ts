@@ -26,7 +26,7 @@ const serversData: { java: ServerInfo[]; bedrock: ServerInfo[] } = {
 class StatusChecker {
   private async getServerInfo(
     address: string,
-    port = 25565
+    port: number = 25565,
   ): Promise<ServerData> {
     return new Promise(async (resolve) => {
       await ping(() => Promise.resolve({ hostname: address, port: port }), {
@@ -54,7 +54,7 @@ class StatusChecker {
     await MongoDB.removeInvalidServers(serversList.java);
 
     for (const server of serversList.java) {
-      const info = await this.getServerInfo(server.address);
+      const info = await this.getServerInfo(server.address, server.port);
 
       if (!info) {
         console.error(`Error fetching server info for ${server.name}`);
@@ -72,6 +72,7 @@ class StatusChecker {
       await MongoDB.pingServer(
         server.name,
         server.address,
+        server.port as number,
         info.currentPlayers,
         image
       );

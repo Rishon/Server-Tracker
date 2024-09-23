@@ -21,8 +21,8 @@
       "address": "parlagames.co.il"
     },
     {
-      "name": "XServers",
-      "address": "xservers.xyz"
+      "name": "ColdZone",
+      "address": "play.coldzone.xyz"
     },
     {
       "name": "SuperKor",
@@ -51,6 +51,11 @@
     {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
+    },
+    {
+      "name": "Solomon World",
+      "address": "149.202.121.100",
+      "port": 25576
     }
   ],
   "bedrock": [{}]

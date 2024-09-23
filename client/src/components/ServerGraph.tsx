@@ -14,6 +14,7 @@ export default function ServerGraph({
   image,
   name,
   ipAddress,
+  port,
   currentPlayers,
   maxPlayers,
   totalPlayers,
@@ -23,6 +24,7 @@ export default function ServerGraph({
   image: string;
   name: string;
   ipAddress: string;
+  port: number;
   currentPlayers: number;
   maxPlayers: number;
   totalPlayers: number;
@@ -149,7 +151,9 @@ export default function ServerGraph({
         <button
           className="absolute right-4 top-4 text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
           onClick={() => {
-            navigator.clipboard.writeText(ipAddress);
+            navigator.clipboard.writeText(
+              `${ipAddress}${port ? `:${port}` : ""}`
+            );
             setNotification("Copied to clipboard!");
             setSnackbarType("success");
             setShowSnackbar(true);
@@ -160,7 +164,10 @@ export default function ServerGraph({
 
         <div className="ml-3 -mt-1">
           <h1 className="text-md font-semibold text-gray-300">{name}</h1>
-          <p className="text-md text-gray-500">{ipAddress}</p>
+          <p className="text-md text-gray-500">
+            {ipAddress}
+            {port ? `:${port}` : ""}
+          </p>
         </div>
       </div>
 

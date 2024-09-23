@@ -25,6 +25,7 @@ class MongoService {
   static async pingServer(
     name: String,
     address: String,
+    port: Number = 25565,
     currentPlayers: Number,
     image: String
   ) {
@@ -39,6 +40,7 @@ class MongoService {
       server = new ServerModel({
         name: name,
         address: address,
+        port: port,
         maxPlayers: currentPlayers,
         totalPlayers: currentPlayers,
         currentDateTime: currentDateTime,
@@ -50,6 +52,9 @@ class MongoService {
 
     // Update address
     server.address = address;
+
+    // Update port
+    if (port != 25565) server.port = port;
 
     server.ping.push({
       currentPlayers: currentPlayers,
@@ -102,7 +107,7 @@ class MongoService {
 
     // If server not found, ping it
     if (!server) {
-      await this.pingServer(name, "", 0, "");
+      await this.pingServer(name, "", 25565, 0, "");
       return;
     }
     return server;
