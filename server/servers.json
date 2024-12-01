@@ -21,10 +21,6 @@
       "address": "parlagames.co.il"
     },
     {
-      "name": "ColdZone",
-      "address": "play.coldzone.xyz"
-    },
-    {
       "name": "SuperKor",
       "address": "mc.superkor.net"
     },
@@ -45,17 +41,8 @@
       "address": "play.loverfella.com"
     },
     {
-      "name": "BenderIL",
-      "address": "benderil.com"
-    },
-    {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
-    },
-    {
-      "name": "Solomon World",
-      "address": "149.202.121.100",
-      "port": 25576
     }
   ],
   "bedrock": [{}]
