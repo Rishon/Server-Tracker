@@ -43,6 +43,10 @@
     {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
+    },
+    {
+      "name": "MCC Island",
+      "address": "play.mccisland.net"
     }
   ],
   "bedrock": [{}]
