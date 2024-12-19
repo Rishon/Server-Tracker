@@ -43,11 +43,13 @@ jobs:
             git pull origin
 
             cd /home/Server-Tracker/client && bun install
+            rm -f .env
             echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
 
             bunx next build
 
             cd /home/Server-Tracker/server && bun install
+            rm -f .env
             echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
             echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> .env
 
