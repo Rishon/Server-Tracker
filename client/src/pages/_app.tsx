@@ -4,10 +4,17 @@ import { ReactElement } from "react";
 // Styles
 import "@/styles/globals.css";
 
+// Context
+import { GraphColorProvider } from "@/contexts/GraphColorContext";
+
 export default function MyApp({
   Component,
   pageProps,
   router,
 }: AppProps): ReactElement {
-  return <Component {...pageProps} key={router.route} />;
+  return (
+    <GraphColorProvider>
+      <Component {...pageProps} key={router.route} />;
+    </GraphColorProvider>
+  );
 }

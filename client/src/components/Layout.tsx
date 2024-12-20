@@ -8,25 +8,15 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 // Components
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Sidebar from "@/components/Sidebar";
-
-// React
-import { useState } from "react";
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const domain = process.env.NEXT_PUBLIC_HOSTNAME;
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Head>
         <title>Server Tracker</title>
-        <meta name="description" content="Track Israeli Minecraft servers" />
+        <meta name="description" content="Track Minecraft servers" />
         <meta name="author" content="Tracker" />
         <meta name="keywords" content="Tracker, Minecraft, Israel, Servers" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -51,7 +41,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
               "@type": "Organization",
               name: "Sela Development",
             },
-            description: "Track Israeli Minecraft servers",
+            description: "Track Minecraft servers",
             potentialAction: {
               "@type": "SearchAction",
               target: `https://${domain}/search?q={search_term_string}`,
@@ -62,8 +52,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       />
 
       <main className="bg-black-gray-dots bg-dots-pattern min-h-screen">
-        <Navbar toggleSidebar={toggleSidebar} />
-        {/* <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} /> */}
+        <Navbar />
         {children}
         <Footer />
       </main>

@@ -3,6 +3,12 @@ import Layout from "@/components/Layout";
 import ServerGraph from "@/components/ServerGraph";
 import { useEffect, useState } from "react";
 
+// Cache
+import { getCache } from "@/data/Cache";
+
+// Context
+import { useGraphColor } from "@/contexts/GraphColorContext";
+
 type ServerData = {
   name: string;
   address: string;
@@ -26,7 +32,12 @@ export default function Home() {
     bedrock: [],
   });
 
+  const { graphColor, setGraphColor } = useGraphColor();
+
   useEffect(() => {
+    const cachedGraphColor = getCache("graphColor");
+    if (cachedGraphColor) setGraphColor(cachedGraphColor);
+
     const fetchServers = async () => {
       try {
         const response = await fetch(
@@ -66,7 +77,7 @@ export default function Home() {
                 maxPlayers={server.maxPlayers}
                 totalPlayers={server.totalPlayers}
                 pings={server.pings}
-                graphColor="#32d67a"
+                graphColor={graphColor}
               />
             ))}
         </div>

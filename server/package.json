@@ -1,6 +1,7 @@
 {
   "name": "server",
   "module": "index.ts",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
