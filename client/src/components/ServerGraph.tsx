@@ -5,13 +5,16 @@ import Image from "next/image";
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 
 // Icons
-import { FaCopy } from "react-icons/fa";
+import { FaCopy, FaEye } from "react-icons/fa";
 
 // Components
 import Snackbar from "@/components/Snackbar";
+import { getCache } from "@/data/Cache";
+import MotdTranslate from "./utils/MotdTranslate";
 
 export default function ServerGraph({
   image,
+  motd,
   name,
   ipAddress,
   port,
@@ -22,6 +25,7 @@ export default function ServerGraph({
   graphColor,
 }: Readonly<{
   image: string;
+  motd: string;
   name: string;
   ipAddress: string;
   port: number;
@@ -45,6 +49,10 @@ export default function ServerGraph({
     setNotification(null);
   };
 
+  // Motd
+  const [toggleMotd, setToggleMotd] = useState<boolean>(false);
+  const [motdMessage, setMotdMessage] = useState<string>("");
+
   // Hover state
   const [hoverX, setHoverX] = useState<number | null>(null);
   const [hoverData, setHoverData] = useState<{
@@ -56,6 +64,9 @@ export default function ServerGraph({
   const [maxGraphWidth, setMaxGraphWidth] = useState(300);
 
   useEffect(() => {
+    // Update MOTD
+    setMotdMessage(motd);
+
     const updateMaxGraphWidth = () => {
       if (graphContainerRef.current) {
         setMaxGraphWidth(graphContainerRef.current.offsetWidth);
@@ -68,7 +79,7 @@ export default function ServerGraph({
     return () => {
       window.removeEventListener("resize", updateMaxGraphWidth);
     };
-  }, []);
+  }, [motd]);
 
   // Path Data
   const pathData = useMemo(() => {
@@ -148,19 +159,33 @@ export default function ServerGraph({
           alt={name}
           className="rounded-lg"
         />
-        <button
-          className="absolute right-4 top-4 text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
-          onClick={() => {
-            navigator.clipboard.writeText(
-              `${ipAddress}${port ? `:${port}` : ""}`
-            );
-            setNotification("Copied to clipboard!");
-            setSnackbarType("success");
-            setShowSnackbar(true);
-          }}
-        >
-          <FaCopy />
-        </button>
+
+        <div className="absolute right-4 top-4 flex flex-row gap-2 flex-nowrap">
+          {getCache("experimental") && (
+            <button
+              className="text-lg sm:text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-2 sm:p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
+              onClick={() => {
+                setToggleMotd(!toggleMotd);
+              }}
+            >
+              <FaEye />
+            </button>
+          )}
+
+          <button
+            className="text-lg sm:text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-2 sm:p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `${ipAddress}${port ? `:${port}` : ""}`
+              );
+              setNotification("Copied to clipboard!");
+              setSnackbarType("success");
+              setShowSnackbar(true);
+            }}
+          >
+            <FaCopy />
+          </button>
+        </div>
 
         <div className="ml-3 -mt-1">
           <h1 className="text-md font-semibold text-gray-300">{name}</h1>
@@ -170,6 +195,15 @@ export default function ServerGraph({
           </p>
         </div>
       </div>
+
+      {/* Motd */}
+      {toggleMotd && getCache("experimental") && (
+        <div className="text-center mt-4 lg:text-left">
+          <p className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:pb-4">
+            <MotdTranslate motd={motdMessage} />
+          </p>
+        </div>
+      )}
 
       {/* Graph */}
       <div

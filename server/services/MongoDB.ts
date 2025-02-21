@@ -27,7 +27,8 @@ class MongoService {
     address: String,
     port: Number = 25565,
     currentPlayers: Number,
-    image: String
+    image: String,
+    motd: String
   ) {
     var server = await ServerModel.findOne({ address: address });
     let currentDateTime = new Date().getTime() as Number;
@@ -45,6 +46,7 @@ class MongoService {
         totalPlayers: currentPlayers,
         currentDateTime: currentDateTime,
         image: image,
+        motd: motd,
       });
 
       console.log(`Server ${name} registered in the database.`);
@@ -67,6 +69,9 @@ class MongoService {
 
     // Update server image
     server.image = image;
+
+    // Update server motd
+    server.motd = motd;
 
     // Update max players based on last 24 hours pings
     if (server.maxPlayers === undefined) server.maxPlayers = 0;
@@ -107,7 +112,7 @@ class MongoService {
 
     // If server not found, ping it
     if (!server) {
-      await this.pingServer(name, "", 25565, 0, "");
+      await this.pingServer(name, "", 25565, 0, "", "");
       return;
     }
     return server;

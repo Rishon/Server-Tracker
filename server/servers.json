@@ -47,6 +47,10 @@
     {
       "name": "MCC Island",
       "address": "play.mccisland.net"
+    },
+    {
+      "name": "IsraelMC",
+      "address": "play.israelmc.net"
     }
   ],
   "bedrock": [{}]

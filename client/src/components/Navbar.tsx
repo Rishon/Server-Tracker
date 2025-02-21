@@ -15,6 +15,7 @@ import Snackbar from "@/components/Snackbar";
 
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
+import { HiOutlineBeaker } from "react-icons/hi";
 
 const Navbar = () => {
   // Navigation
@@ -23,6 +24,9 @@ const Navbar = () => {
 
   // Current graph color
   const { graphColor, setGraphColor } = useGraphColor();
+
+  // Experimental
+  const [showExperimental, setShowExperimental] = useState(false);
 
   // Snackbar
   const [notification, setNotification] = useState<string | null>(null);
@@ -60,7 +64,10 @@ const Navbar = () => {
   useEffect(() => {
     const cachedGraphColor = getCache("graphColor");
     if (cachedGraphColor) setGraphColor(cachedGraphColor);
-  }, [setGraphColor]);
+
+    const cachedExperimental = getCache("experimental");
+    if (cachedExperimental) setShowExperimental(cachedExperimental);
+  }, [setGraphColor, setShowExperimental]);
 
   function setColor(color: string) {
     setCache("graphColor", color);
@@ -112,6 +119,23 @@ const Navbar = () => {
               className="text-2xl cursor-pointer"
               style={{ color: graphColor }}
               onClick={() => setShowColorPicker(!showColorPicker)}
+            />
+
+            <HiOutlineBeaker
+              className="text-2xl cursor-pointer"
+              onClick={() => {
+                setShowExperimental(!showExperimental);
+                setCache("experimental", !showExperimental);
+                sendSnackbar(
+                  "Experimental Features have been " +
+                    (showExperimental ? "disabled" : "enabled") +
+                    "!",
+                  "success"
+                );
+              }}
+              style={{
+                color: showExperimental ? "#32D67A" : "#FF4545",
+              }}
             />
           </div>
         </div>
