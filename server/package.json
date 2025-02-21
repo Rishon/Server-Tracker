@@ -16,6 +16,6 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "minecraft-server-ping": "^0.1.4",
-    "mongoose": "^8.9.1"
+    "mongoose": "^8.10.1"
   }
 }

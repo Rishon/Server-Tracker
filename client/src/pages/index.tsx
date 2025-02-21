@@ -57,7 +57,7 @@ export default function Home() {
 
     const intervalId = setInterval(fetchServers, 1000 * 10);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [setGraphColor]);
 
   return (
     <Layout>

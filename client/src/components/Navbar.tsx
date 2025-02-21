@@ -60,7 +60,7 @@ const Navbar = () => {
   useEffect(() => {
     const cachedGraphColor = getCache("graphColor");
     if (cachedGraphColor) setGraphColor(cachedGraphColor);
-  }, []);
+  }, [setGraphColor]);
 
   function setColor(color: string) {
     setCache("graphColor", color);
