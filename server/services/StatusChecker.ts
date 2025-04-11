@@ -41,7 +41,7 @@ const serversData: { java: ServerInfo[]; bedrock: ServerInfo[] } = {
 class StatusChecker {
   private async getServerInfo(
     address: string,
-    port: number = 25565,
+    port: number = 25565
   ): Promise<ServerData> {
     return new Promise(async (resolve) => {
       await ping(() => Promise.resolve({ hostname: address, port: port }), {
@@ -73,9 +73,15 @@ class StatusChecker {
     let startTime = new Date().getTime();
     console.log("Fetching servers data...");
 
+    const list = serversList.java as {
+      name: string;
+      address: string;
+      port: number;
+    }[];
+
     await MongoDB.removeInvalidServers(serversList.java);
 
-    for (const server of serversList.java) {
+    for (const server of list) {
       const info = await this.getServerInfo(server.address, server.port);
 
       if (!info) {
@@ -104,7 +110,10 @@ class StatusChecker {
         motd
       );
 
-      const mongoServer = await MongoDB.getServerData(server.name, server.address);
+      const mongoServer = await MongoDB.getServerData(
+        server.name,
+        server.address
+      );
       if (!mongoServer) {
         console.error(`Server ${server.name} not found in the database.`);
         continue;
@@ -132,7 +141,11 @@ class StatusChecker {
     }
 
     let endTime = new Date().getTime();
-    console.log(`Fetched servers data in ${endTime - startTime}ms`);
+    console.log(
+      `Fetched servers data in ${endTime - startTime}ms (${Math.floor(
+        (endTime - startTime) / 1000
+      )}s)`
+    );
   }
 
   public getServersData() {
