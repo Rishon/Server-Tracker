@@ -43,6 +43,18 @@
     {
       "name": "MCC Island",
       "address": "play.mccisland.net"
+    },
+    {
+      "name": "Hila SMP",
+      "address": "xhilasmp.xyz"
+    },
+    {
+      "name": "BenderIL",
+      "address": "benderil.com"
+    },
+    {
+      "name": "GamesIL",
+      "address": "gamesil.online"
     }
   ],
   "bedrock": [{}]
