@@ -14,8 +14,8 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "minecraft-server-ping": "^0.1.4",
-    "mongoose": "^8.10.1"
+    "mongoose": "^8.15.1"
   }
 }
