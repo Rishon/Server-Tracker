@@ -55,6 +55,10 @@
     {
       "name": "GamesIL",
       "address": "gamesil.online"
+    },
+    {
+      "name": "LifeSteal Israel",
+      "address": "play.lifesteal-il.net"
     }
   ],
   "bedrock": [{}]
