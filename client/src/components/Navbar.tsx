@@ -104,11 +104,10 @@ const Navbar = () => {
             {links.map((link) => (
               <Link key={link.path} href={link.path} target={link.target}>
                 <p
-                  className={`text-md ${
-                    currentPage === link.path
+                  className={`text-md ${currentPage === link.path
                       ? "text-white-500 cursor-pointer"
                       : "hover:text-white text-gray-700 cursor-pointer"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </p>
@@ -128,8 +127,8 @@ const Navbar = () => {
                 setCache("experimental", !showExperimental);
                 sendSnackbar(
                   "Experimental Features have been " +
-                    (showExperimental ? "disabled" : "enabled") +
-                    "!",
+                  (showExperimental ? "disabled" : "enabled") +
+                  "!",
                   "success"
                 );
               }}
