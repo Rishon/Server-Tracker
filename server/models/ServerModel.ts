@@ -7,6 +7,7 @@ interface IServer extends Document {
   maxPlayers: Number;
   totalPlayers: Number;
   image: String;
+  motd: String;
   ping: Array<{ currentPlayers: Number; timestamp: Number }>;
 }
 
@@ -17,6 +18,7 @@ const serverSchema: Schema = new Schema({
   maxPlayers: { type: Number, required: true },
   totalPlayers: { type: Number, required: false },
   image: { type: String, required: false },
+  motd: { type: String, required: false },
   ping: { type: Array, required: false },
 });
 

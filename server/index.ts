@@ -74,8 +74,6 @@ const server = serve({
             );
         }
       } else if (method === "GET") {
-        const query = new URLSearchParams(request.url.split("?")[1]);
-
         switch (path) {
           case "servers":
             // Return servers data

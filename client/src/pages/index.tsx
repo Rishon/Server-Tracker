@@ -16,6 +16,7 @@ type ServerData = {
   platform: string;
   currentPlayers: number;
   image: string;
+  motd: string;
   maxPlayers: number;
   totalPlayers: number;
   pings: any[];
@@ -70,6 +71,7 @@ export default function Home() {
               <ServerGraph
                 key={index}
                 image={server.image}
+                motd={server.motd}
                 name={server.name}
                 ipAddress={server.address}
                 port={server.port}

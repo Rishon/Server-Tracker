@@ -23,11 +23,10 @@ const Snackbar: React.FC<SnackbarProps> = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`fixed bottom-5 right-5 p-4 rounded-md z-50 transition-all duration-500 ease-in-out transform ${
-        isVisible
+      className={`fixed bottom-5 right-5 p-4 rounded-md z-50 transition-all duration-500 ease-in-out transform ${isVisible
           ? "opacity-100 translate-x-0"
           : "opacity-0 translate-x-5 pointer-events-none"
-      } ${type === "success" ? "bg-green-500" : "bg-red-500"}`}
+        } ${type === "success" ? "bg-green-500" : "bg-red-500"}`}
     >
       <div className="text-white">{message}</div>
     </div>
