@@ -20,60 +20,59 @@ const MotdTranslate: React.FC<{ motd: string }> = ({ motd }) => {
     white: "#FFFFFF",
   };
 
-  const regex = /(#[0-9A-Fa-f]{6}|[a-z_]+):([^ ]+)/g;
+  const regex = /(#[0-9A-Fa-f]{6}|[a-z_]+):([^#a-z_]+)?/g;
 
-  const isRTL = (text: string) => {
-    const rtlRegex = /[\u0590-\u05FF]/;
-    return rtlRegex.test(text);
-  };
+  const isRTL = (text: string) => /[\u0590-\u05FF]/.test(text);
 
-  const parts = [];
+  const parts: (string | { type: "styled"; content: string; color: string })[] = [];
   let lastIndex = 0;
   let match;
 
   while ((match = regex.exec(motd)) !== null) {
-    if (match.index > lastIndex)
-      parts.push({ type: "text", content: motd.slice(lastIndex, match.index) });
+    if (match.index > lastIndex) {
+      const before = motd.slice(lastIndex, match.index);
+      if (before) parts.push(before);
+    }
 
-    const color = colorMap[match[1]] || match[1];
-    const text = match[2].trim();
-    parts.push({ type: "styled", color, content: text });
+    const rawColor = match[1];
+    let text = (match[2] || "");
+
+    if (text.length > 0) {
+      if (!text.endsWith(" ")) text += " ";
+      const color = rawColor.startsWith("#") ? rawColor : colorMap[rawColor] || "#FFFFFF";
+      parts.push({ type: "styled", color, content: text });
+    }
 
     lastIndex = regex.lastIndex;
   }
 
-  if (lastIndex < motd.length)
-    parts.push({ type: "text", content: motd.slice(lastIndex) });
+  if (lastIndex < motd.length) {
+    parts.push(motd.slice(lastIndex));
+  }
 
   return (
-    <div style={{ unicodeBidi: "plaintext" }}>
+    <div style={{ unicodeBidi: "plaintext", whiteSpace: "pre-wrap" }}>
       {parts.map((part, index) => {
-        if (part.type === "text") {
-          return (
-            <span
-              key={index}
-              style={{
-                direction: isRTL(part.content) ? "rtl" : "ltr",
-                unicodeBidi: "embed",
-              }}
-            >
-              {part.content}
-            </span>
-          );
-        } else {
-          return (
-            <span
-              key={index}
-              style={{
-                color: part.color,
-                direction: isRTL(part.content) ? "rtl" : "ltr",
-                unicodeBidi: "embed",
-              }}
-            >
-              {part.content}
-            </span>
-          );
+        if (typeof part === "string") {
+          return part.split("\n").map((chunk, i, arr) => (
+            <React.Fragment key={`${index}-${i}`}>
+              {chunk}
+              {i < arr.length - 1 && <br />}
+            </React.Fragment>
+          ));
         }
+        return (
+          <span
+            key={index}
+            style={{
+              color: part.color,
+              direction: isRTL(part.content) ? "rtl" : "ltr",
+              unicodeBidi: "embed",
+            }}
+          >
+            {part.content}
+          </span>
+        );
       })}
     </div>
   );
