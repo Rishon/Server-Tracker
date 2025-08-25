@@ -21,10 +21,6 @@
       "address": "parlagames.co.il"
     },
     {
-      "name": "SuperKor",
-      "address": "mc.superkor.net"
-    },
-    {
       "name": "TigerNetwork",
       "address": "play.tigeril.online"
     },
@@ -33,24 +29,28 @@
       "address": "play.scapecraft.net"
     },
     {
-      "name": "Shotist",
-      "address": "play.shotist.net"
+      "name": "IsraelMC",
+      "address": "play.israelmc.net"
     },
     {
       "name": "LoverCraft",
       "address": "play.loverfella.com"
     },
     {
-      "name": "Israel Practice",
-      "address": "play.israelpractice.net"
-    },
-    {
       "name": "MCC Island",
       "address": "play.mccisland.net"
     },
     {
-      "name": "IsraelMC",
-      "address": "play.israelmc.net"
+      "name": "LifeSteal Israel",
+      "address": "play.lifesteal-il.net"
+    },
+    {
+      "name": "OnlyGood",
+      "address": "only-good.xyz"
+    },
+    {
+      "name": "Hameura",
+      "address": "hameura.net"
     }
   ],
   "bedrock": [{}]
