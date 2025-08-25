@@ -21,7 +21,7 @@
 *.pem
 
 # bun
-bun.lockb
+bun.lock
 
 # debug
 npm-debug.log*

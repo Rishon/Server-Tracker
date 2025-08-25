@@ -80,7 +80,7 @@ web_modules/
 .stylelintcache
 
 # bun
-.bun.lockb
+bun.lock
 
 # Microbundle cache
 
