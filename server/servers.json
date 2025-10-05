@@ -51,7 +51,13 @@
     {
       "name": "Hameura",
       "address": "hameura.net"
+    },
+    {
+      "name": "Shotist",
+      "address": "play.shotist.net"
     }
   ],
-  "bedrock": [{}]
+  "bedrock": [
+    {}
+  ]
 }
