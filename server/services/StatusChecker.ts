@@ -9,12 +9,14 @@ import { ping } from "minecraft-server-ping";
 
 // Interfaces
 interface ServerData {
+  isOnline?: Boolean;
   currentPlayers: Number;
   image: String;
   motd: String;
 }
 
 interface ServerInfo {
+  isOnline?: Boolean;
   address: String;
   port?: Number;
   currentPlayers: Number;
@@ -54,6 +56,7 @@ class StatusChecker {
           const coloredText = colorTextMap.join(" ");
 
           resolve({
+            isOnline: true,
             image: data.favicon || "",
             motd: coloredText,
             currentPlayers: data.players.online,
@@ -61,6 +64,7 @@ class StatusChecker {
         })
         .catch(() => {
           resolve({
+            isOnline: false,
             image: "",
             motd: "",
             currentPlayers: 0,
@@ -121,6 +125,7 @@ class StatusChecker {
 
       const serverData = {
         ...server,
+        isOnline: info.isOnline,
         currentPlayers: info.currentPlayers,
         maxPlayers: mongoServer.maxPlayers,
         totalPlayers: mongoServer.totalPlayers,

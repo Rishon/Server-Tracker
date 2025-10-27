@@ -13,6 +13,7 @@ import { getCache } from "@/data/Cache";
 import MotdTranslate from "./utils/MotdTranslate";
 
 export default function ServerGraph({
+  isOnline,
   image,
   motd,
   name,
@@ -24,6 +25,7 @@ export default function ServerGraph({
   pings,
   graphColor,
 }: Readonly<{
+  isOnline: boolean;
   image: string;
   motd: string;
   name: string;
@@ -140,8 +142,19 @@ export default function ServerGraph({
   };
 
   return (
-    // Snack bar
-    <div className="items-left justify-center p-4 bg-[#0f0f10] border border-[#2f2f2f] rounded-lg shadow-lg relative">
+    <div
+      className={`items-left justify-center p-4 ${isOnline
+        ? "bg-[#0f0f10]"
+        : "bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
+        } border ${isOnline ? "border-[#2f2f2f]" : "border-[#3d2a2a]"
+        } rounded-lg shadow-lg relative`}
+    >
+
+      {!isOnline && (
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,100,100,0.05),rgba(0,0,0,0.6))] mix-blend-overlay pointer-events-none" />
+      )}
+
+      {/* Snack bar */}
       {showSnackbar && (
         <Snackbar
           message={notification || ""}

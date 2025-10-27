@@ -44,36 +44,8 @@ const server = serve({
     if (pathname.startsWith(`/${version}`)) {
       const path = pathname.slice(version.length + 1).replace("/", "");
 
-      // Handle Post requests
-      if (method === "POST") {
-        // Validate JSON requests
-        if (
-          !request.headers.get("content-type")?.includes("application/json")
-        ) {
-          return ResponseHandler.invalidResponse(ResponseHandler.INVALID_BODY);
-        }
-
-        let body;
-        try {
-          const text = await request.text();
-          if (text) {
-            body = JSON.parse(text);
-          } else {
-            return ResponseHandler.invalidResponse(
-              ResponseHandler.INVALID_BODY
-            );
-          }
-        } catch (error) {
-          return ResponseHandler.invalidResponse(ResponseHandler.INVALID_BODY);
-        }
-
-        switch (path) {
-          default:
-            return ResponseHandler.invalidResponse(
-              ResponseHandler.INVALID_ROUTE
-            );
-        }
-      } else if (method === "GET") {
+      // Handle GET requests
+      if (method === "GET") {
         switch (path) {
           case "servers":
             // Return servers data

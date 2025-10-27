@@ -16,6 +16,7 @@ type ServerData = {
   platform: string;
   currentPlayers: number;
   image: string;
+  isOnline: boolean;
   motd: string;
   maxPlayers: number;
   totalPlayers: number;
@@ -65,11 +66,22 @@ export default function Home() {
       <main className="items-center pt-16 pb-24 ml-4">
         <div className="rounded-lg shadow-lg p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {serversData.java
-            .sort((a, b) => b.currentPlayers - a.currentPlayers)
+            .sort((a, b) => {
+              if (a.isOnline !== b.isOnline) {
+                return a.isOnline ? -1 : 1;
+              }
+
+              if (b.currentPlayers !== a.currentPlayers) {
+                return b.currentPlayers - a.currentPlayers;
+              }
+
+              return b.name.localeCompare(a.name);
+            })
             .filter((server) => server.name !== "")
             .map((server, index) => (
               <ServerGraph
                 key={index}
+                isOnline={server.isOnline}
                 image={server.image}
                 motd={server.motd}
                 name={server.name}
