@@ -55,9 +55,11 @@
     {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
+    },
+    {
+      "name": "Ranb Realm",
+      "address": "play.ranbrealm.net"
     }
   ],
-  "bedrock": [
-    {}
-  ]
+  "bedrock": [{}]
 }
