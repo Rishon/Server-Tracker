@@ -59,7 +59,13 @@
     {
       "name": "Ranb Realm",
       "address": "play.ranbrealm.net"
+    },
+    {
+      "name": "Tropica",
+      "address": "play.tropica.fun"
     }
   ],
-  "bedrock": [{}]
+  "bedrock": [
+    {}
+  ]
 }
