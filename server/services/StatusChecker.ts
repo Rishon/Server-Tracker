@@ -45,31 +45,46 @@ class StatusChecker {
     address: string,
     port: number = 25565
   ): Promise<ServerData> {
-    return new Promise(async (resolve) => {
-      await ping(() => Promise.resolve({ hostname: address, port: port }), {
-        timeout: 1000 * 15,
-      })
-        .then((data) => {
-          const colorTextMap: string[] = [];
-          const coloredText = colorTextMap.join(" ");
+    const MAX_RETRIES = 3;
 
-          resolve({
-            isOnline: true,
-            image: data.favicon || "",
-            motd: coloredText,
-            currentPlayers: data.players.online,
-          });
-        })
-        .catch(() => {
-          resolve({
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const data = await ping(
+          () => Promise.resolve({ hostname: address, port }),
+          { timeout: 1000 * 15 }
+        );
+
+        const colorTextMap: string[] = [];
+        const coloredText = colorTextMap.join(" ");
+
+        return {
+          isOnline: true,
+          image: data.favicon || "",
+          motd: coloredText,
+          currentPlayers: data.players.online,
+        };
+      } catch (error) {
+        if (attempt === MAX_RETRIES) {
+          return {
             isOnline: false,
             image: "",
             motd: "",
             currentPlayers: 0,
-          });
-        });
-    });
+          };
+        }
+
+        await new Promise((res) => setTimeout(res, 500));
+      }
+    }
+
+    return {
+      isOnline: false,
+      image: "",
+      motd: "",
+      currentPlayers: 0,
+    };
   }
+
 
   public async fetchServersData() {
     let startTime = new Date().getTime();
