@@ -47,12 +47,10 @@ class StatusChecker {
   ): Promise<ServerData> {
     return new Promise(async (resolve) => {
       await ping(() => Promise.resolve({ hostname: address, port: port }), {
-        timeout: 5000,
+        timeout: 1000 * 15,
       })
         .then((data) => {
-          const motd = data.description as MotdData;
           const colorTextMap: string[] = [];
-          const extractedText = extractData(motd, colorTextMap);
           const coloredText = colorTextMap.join(" ");
 
           resolve({
