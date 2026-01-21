@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 // Models
 import ServerModel from "../models/ServerModel";
 
+// Platform type
+type Platform = "minecraft" | "hytale";
+
 class MongoService {
   // Connect to MongoDB
   static async connect(uri: string) {
@@ -25,31 +28,27 @@ class MongoService {
   static async pingServer(
     name: String,
     address: String,
-    port: Number = 25565,
+    port: Number,
     currentPlayers: Number,
     image: String,
-    motd: String
+    motd: String,
+    platform: Platform
   ) {
-    var server = await ServerModel.findOne({ address: address });
+    let server = await ServerModel.findOne({ address, platform });
     let currentDateTime = new Date().getTime() as Number;
 
     if (!server) {
-      console.error(
-        `Server ${name} not found... Registering it in the database.`
-      );
-
       server = new ServerModel({
-        name: name,
-        address: address,
-        port: port,
+        name,
+        address,
+        port,
+        platform,
         maxPlayers: currentPlayers,
         totalPlayers: currentPlayers,
-        currentDateTime: currentDateTime,
-        image: image,
-        motd: motd,
+        ping: [],
+        image,
+        motd,
       });
-
-      console.log(`Server ${name} registered in the database.`);
     }
 
     // Update address
@@ -94,28 +93,20 @@ class MongoService {
   }
 
   // Delete servers that are not in the servers list
-  static async removeInvalidServers(serversList: Array<any>) {
-    const servers = await ServerModel.find();
-    for (const server of servers) {
-      if (!serversList.find((s) => s.name === server.name)) {
-        console.log(`Server ${server.name} not found in the servers list.`);
-        await server.deleteOne();
-      }
-    }
+  static async removeInvalidServers(serversList: Array<{ address: string }>) {
+    const validAddresses = new Set(
+      serversList.map(s => s.address)
+    );
+
+    await ServerModel.deleteMany({
+      address: { $nin: [...validAddresses] }
+    });
   }
 
-  // Get server data
-  static async getServerData(name: String, address: String) {
-    const server = await ServerModel.findOne({
-      address: address,
-    });
-
-    // If server not found, ping it
-    if (!server) {
-      await this.pingServer(name, "", 25565, 0, "", "");
-      return;
-    }
-    return server;
+  static async getServerData(
+    address: String,
+  ) {
+    return ServerModel.findOne({ address });
   }
 }
 

@@ -12,10 +12,12 @@ import { setCache, getCache } from "@/data/Cache";
 
 // Components
 import Snackbar from "@/components/Snackbar";
+import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
 import { HiOutlineBeaker } from "react-icons/hi";
+import { useCurrentList } from "@/contexts/CurrentListContext";
 
 const Navbar = () => {
   // Navigation
@@ -24,6 +26,9 @@ const Navbar = () => {
 
   // Current graph color
   const { graphColor, setGraphColor } = useGraphColor();
+
+  // Current list
+  const { currentList, setCurrentList } = useCurrentList();
 
   // Experimental
   const [showExperimental, setShowExperimental] = useState(false);
@@ -90,103 +95,170 @@ const Navbar = () => {
         />
       )}
 
-      <nav className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between bg-[#0f0f10] p-4 border-b border-[#2f2f2f]">
-        <div className="flex items-center flex-shrink-0 text-white space-x-4">
-          <Link href="/" className="font-semibold text-2xl tracking-tight">
+      <nav className="fixed top-4 left-1/2 z-30 w-[95%] max-w-6xl -translate-x-1/2
+  rounded-2xl border border-white/10
+  bg-[#0f0f10]/80 backdrop-blur-xl shadow-lg px-6 py-3">
+
+        <div className="flex items-center justify-between">
+
+          <Link href="/" className="flex items-center gap-2">
             <Image
               src="/assets/icon.webp"
-              width={25}
-              height={25}
+              width={28}
+              height={28}
               alt="Server Tracker"
+              className="rounded-md"
             />
+            <span className="hidden sm:block text-lg font-semibold tracking-tight">
+              Server Tracker
+            </span>
           </Link>
-          <div className="flex lg:flex lg:items-center ml-auto space-x-4">
+
+          <div className="hidden md:flex items-center gap-6">
             {links.map((link) => (
-              <Link key={link.path} href={link.path} target={link.target}>
-                <p
-                  className={`text-md ${currentPage === link.path
-                      ? "text-white-500 cursor-pointer"
-                      : "hover:text-white text-gray-700 cursor-pointer"
-                    }`}
-                >
-                  {link.label}
-                </p>
+              <Link
+                key={link.path}
+                href={link.path}
+                target={link.target}
+                className={`relative text-sm font-medium transition-colors
+            ${currentPage === link.path
+                    ? "text-white"
+                    : "text-gray-400 hover:text-white"
+                  }`}
+              >
+                {link.label}
+                {currentPage === link.path && (
+                  <span className="absolute -bottom-1 left-0 h-[2px] w-full bg-white rounded-full" />
+                )}
               </Link>
             ))}
+          </div>
 
-            <MdOutlineInvertColors
-              className="text-2xl cursor-pointer"
-              style={{ color: graphColor }}
+          <div className="flex items-center gap-2">
+
+            <button
+              onClick={() => {
+                const next = currentList === "minecraft" ? "hytale" : "minecraft";
+                setCurrentList(next);
+                sendSnackbar(
+                  `${next.charAt(0).toUpperCase() + next.slice(1)} server list selected!`,
+                  "success"
+                );
+              }}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+            >
+              <Image
+                src={
+                  currentList === "minecraft"
+                    ? "/assets/games/minecraft.webp"
+                    : "/assets/games/hytale.webp"
+                }
+                width={22}
+                height={22}
+                alt="Game Toggle"
+              />
+            </button>
+
+            <button
               onClick={() => setShowColorPicker(!showColorPicker)}
-            />
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+            >
+              <MdOutlineInvertColors
+                className="text-xl"
+                style={{ color: graphColor }}
+              />
+            </button>
 
-            <HiOutlineBeaker
-              className="text-2xl cursor-pointer"
+            <button
               onClick={() => {
                 setShowExperimental(!showExperimental);
                 setCache("experimental", !showExperimental);
                 sendSnackbar(
-                  "Experimental Features have been " +
-                  (showExperimental ? "disabled" : "enabled") +
-                  "!",
+                  `Experimental Features ${showExperimental ? "disabled" : "enabled"
+                  }!`,
                   "success"
                 );
               }}
-              style={{
-                color: showExperimental ? "#32D67A" : "#FF4545",
-              }}
-            />
+              className={`p-2 rounded-xl transition
+          ${showExperimental
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-red-500/20 text-red-400"
+                }`}
+            >
+              <HiOutlineBeaker className="text-xl" />
+            </button>
+
           </div>
         </div>
 
-        {showColorPicker && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-[#0f0f10] p-8 rounded-md shadow-lg border border-[#2f2f2f] w-[90%] max-w-md space-y-6 text-center">
-              <h3 className="text-lg font-semibold">Select a Graph Color</h3>
-
-              <div className="flex justify-center">
-                <div className="grid grid-cols-3 gap-6">
-                  {graphColors.map((color) => (
-                    <div
-                      key={color}
-                      className="w-8 h-8 rounded-full cursor-pointer"
-                      style={{
-                        backgroundColor: color,
-                        border:
-                          color === graphColor ? "2px solid #E5E1DA" : "none",
-                      }}
-                      onClick={() => {
-                        setColor(color);
-                        sendSnackbar(
-                          "Graph Color has been updated!",
-                          "success"
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <input
-                type="text"
-                className="w-full py-2 px-4 bg-gray-800 text-white rounded-md"
-                placeholder={graphColor}
-                onChange={(e) => {
-                  if (!/^#[0-9A-F]{6}$/i.test(e.target.value)) return;
-                  setColor(e.target.value);
-                }}
-              />
-
-              <button
-                className="py-2 mt-4 bg-gray-800 text-white rounded-md w-full hover:bg-gray-700 transition-all duration-200 ease-in-out"
-                onClick={() => setShowColorPicker(false)}
-              >
-                Close
-              </button>
-            </div>
+        {currentList === "hytale" && (
+          <div
+            className="mt-3 flex items-center gap-2 rounded-xl
+    border border-orange-400/20
+    bg-orange-500/10 px-4 py-2
+    text-sm text-orange-300
+    backdrop-blur-md"
+          >
+            <HiOutlineExclamationTriangle className="text-base shrink-0" />
+            <span>
+              Hytale servers require the
+              <Link href={"https://github.com/HytaleOne/hytale-one-query-plugin/releases"} target="_blank" rel="noopener noreferrer">
+                <span className="mx-1 rounded bg-orange-400/20 px-1.5 py-0.5 font-mono text-orange-200">
+                  HytaleOne Query Plugin
+                </span>
+              </Link>
+              mod for queries to function correctly.
+            </span>
           </div>
         )}
       </nav>
+
+      {showColorPicker && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-[90%] max-w-md rounded-2xl border border-white/10
+      bg-[#0f0f10] p-6 shadow-xl space-y-6">
+
+            <h3 className="text-lg font-semibold text-center">
+              Select Graph Color
+            </h3>
+
+            <div className="grid grid-cols-3 gap-4 place-items-center">
+              {graphColors.map((color) => (
+                <button
+                  key={color}
+                  className={`h-10 w-10 rounded-full transition transform hover:scale-110
+              ${color === graphColor ? "ring-2 ring-white" : ""}`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => {
+                    setColor(color);
+                    sendSnackbar("Graph color updated!", "success");
+                  }}
+                />
+              ))}
+            </div>
+
+            <input
+              type="text"
+              className="w-full rounded-lg bg-white/5 px-4 py-2 text-center
+          text-sm outline-none ring-1 ring-white/10 focus:ring-white/30"
+              placeholder={graphColor}
+              onChange={(e) => {
+                if (!/^#[0-9A-F]{6}$/i.test(e.target.value)) return;
+                setColor(e.target.value);
+              }}
+            />
+
+            <button
+              onClick={() => setShowColorPicker(false)}
+              className="w-full rounded-lg bg-white/10 py-2 text-sm
+          hover:bg-white/20 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 };

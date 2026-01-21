@@ -6,6 +6,7 @@ import "@/styles/globals.css";
 
 // Context
 import { GraphColorProvider } from "@/contexts/GraphColorContext";
+import { CurrentListProvider } from "@/contexts/CurrentListContext";
 
 export default function MyApp({
   Component,
@@ -14,7 +15,9 @@ export default function MyApp({
 }: AppProps): ReactElement {
   return (
     <GraphColorProvider>
-      <Component {...pageProps} key={router.route} />;
+      <CurrentListProvider>
+        <Component {...pageProps} key={router.route} />;
+      </CurrentListProvider>
     </GraphColorProvider>
   );
 }
