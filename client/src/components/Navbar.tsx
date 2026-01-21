@@ -12,7 +12,7 @@ import { setCache, getCache } from "@/data/Cache";
 
 // Components
 import Snackbar from "@/components/Snackbar";
-import { TbSquareRoundedLetterHFilled } from "react-icons/tb";
+import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
@@ -190,6 +190,27 @@ const Navbar = () => {
 
           </div>
         </div>
+
+        {currentList === "hytale" && (
+          <div
+            className="mt-3 flex items-center gap-2 rounded-xl
+    border border-orange-400/20
+    bg-orange-500/10 px-4 py-2
+    text-sm text-orange-300
+    backdrop-blur-md"
+          >
+            <HiOutlineExclamationTriangle className="text-base shrink-0" />
+            <span>
+              Hytale servers require the
+              <Link href={"https://github.com/HytaleOne/hytale-one-query-plugin/releases"} target="_blank" rel="noopener noreferrer">
+                <span className="mx-1 rounded bg-orange-400/20 px-1.5 py-0.5 font-mono text-orange-200">
+                  HytaleOne Query Plugin
+                </span>
+              </Link>
+              mod for queries to function correctly.
+            </span>
+          </div>
+        )}
       </nav>
 
       {showColorPicker && (

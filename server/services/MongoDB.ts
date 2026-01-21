@@ -93,17 +93,16 @@ class MongoService {
   }
 
   // Delete servers that are not in the servers list
-  static async removeInvalidServers(serversList: Array<any>) {
-    const servers = await ServerModel.find();
-    for (const server of servers) {
-      if (!serversList.find((s) => s.address === server.address)) {
-        //  console.log(`Server ${server.address} not found in the servers list.`);
-        await server.deleteOne();
-      }
-    }
+  static async removeInvalidServers(serversList: Array<{ address: string }>) {
+    const validAddresses = new Set(
+      serversList.map(s => s.address)
+    );
+
+    await ServerModel.deleteMany({
+      address: { $nin: [...validAddresses] }
+    });
   }
 
-  // Get server data
   static async getServerData(
     address: String,
   ) {

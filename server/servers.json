@@ -65,5 +65,10 @@
       "address": "play.israelpractice.net"
     }
   ],
-  "hytale": []
+  "hytale": [
+    {
+      "name": "Hystrix",
+      "address": "play.hystrix.gg"
+    }
+  ]
 }

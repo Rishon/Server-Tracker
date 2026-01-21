@@ -6,6 +6,7 @@ import MongoDB from "./MongoDB";
 
 // Query
 import { ping } from "minecraft-server-ping";
+import { query } from '@hytaleone/query';
 
 // Utils
 import { getFallbackHytaleImage, getFallbackMCImage } from "../utils/ImageData";
@@ -46,59 +47,6 @@ const serversData: Record<Platform, ServerInfo[]> = {
 };
 
 class StatusChecker {
-  private async getServerInfo(
-    address: string,
-    port: number = 25565
-  ): Promise<ServerData> {
-    const MAX_RETRIES = 3;
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const data = await ping(
-          () => Promise.resolve({ hostname: address, port }),
-          { timeout: 1000 }
-        );
-
-        const motd = data.description as MotdData;
-        const colorTextMap: string[] = [];
-        extractData(motd, colorTextMap);
-
-        const coloredText = colorTextMap.join(" ");
-
-        return {
-          isOnline: true,
-          image: data.favicon || "",
-          motd: coloredText,
-          currentPlayers: data.players.online,
-        };
-      } catch (error) {
-        if (attempt === MAX_RETRIES) {
-          return {
-            isOnline: false,
-            image: "",
-            motd: "",
-            currentPlayers: 0,
-          };
-        }
-
-        await new Promise((res) => setTimeout(res, 500));
-      }
-    }
-
-    return {
-      isOnline: false,
-      image: "",
-      motd: "",
-      currentPlayers: 0,
-    };
-  }
-
-  public async fetchAllServers() {
-    await Promise.all([
-      this.fetchServersData("minecraft"),
-      this.fetchServersData("hytale"),
-    ]);
-  }
 
   public async fetchServersData(platform: Platform) {
     const startTime = Date.now();
@@ -112,9 +60,7 @@ class StatusChecker {
       port: number;
     }[];
 
-    await MongoDB.removeInvalidServers(list);
-
-    const tasks = list.map((server) =>
+    const tasks = list.map(server =>
       this.fetchSingleServer(server, platform)
     );
 
@@ -132,7 +78,6 @@ class StatusChecker {
     );
   }
 
-
   private async fetchSingleServer(
     server: {
       name: string;
@@ -142,15 +87,15 @@ class StatusChecker {
     platform: Platform
   ) {
     try {
-      const info = await this.getServerInfo(server.address, server.port);
+      const info =
+        platform === "minecraft"
+          ? await this.getMinecraftServerInfo(server.address, server.port)
+          : await this.getHytaleServerInfo(server.address, server.port);
 
-      let image;
-
-      if (platform === "hytale") { // For now until we get Hytale icons
-        image = getFallbackHytaleImage();
-      } else {
-        image = info.image || getFallbackMCImage();
-      }
+      const image =
+        platform === "hytale"
+          ? getFallbackHytaleImage()
+          : info.image || getFallbackMCImage();
 
       const motd = info.motd || "Server Offline";
 
@@ -164,10 +109,7 @@ class StatusChecker {
         platform
       );
 
-      const mongoServer = await MongoDB.getServerData(
-        server.address,
-      );
-
+      const mongoServer = await MongoDB.getServerData(server.address);
       if (!mongoServer) return null;
 
       return {
@@ -186,6 +128,88 @@ class StatusChecker {
       return null;
     }
   }
+
+  private async getMinecraftServerInfo(
+    address: string,
+    port: number = 25565
+  ): Promise<ServerData> {
+    const MAX_RETRIES = 3;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const data = await ping(
+          () => Promise.resolve({ hostname: address, port }),
+          { timeout: 1000 }
+        );
+
+        const motd = data.description as MotdData;
+        const colorTextMap: string[] = [];
+        extractData(motd, colorTextMap);
+
+        return {
+          isOnline: true,
+          image: data.favicon || "",
+          motd: colorTextMap.join(" "),
+          currentPlayers: data.players.online,
+        };
+      } catch {
+        if (attempt === MAX_RETRIES) {
+          return {
+            isOnline: false,
+            image: "",
+            motd: "",
+            currentPlayers: 0,
+          };
+        }
+
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    return {
+      isOnline: false,
+      image: "",
+      motd: "",
+      currentPlayers: 0,
+    };
+  }
+
+  private async getHytaleServerInfo(
+    address: string,
+    port: number = 5520
+  ): Promise<ServerData> {
+
+    try {
+      const info = await query(address, port);
+
+      return {
+        isOnline: true,
+        image: "", // Hytale does not provide icons yet
+        motd: info.motd || "",
+        currentPlayers: info.currentPlayers || 0,
+      };
+    } catch (e) {
+      return {
+        isOnline: false,
+        image: "",
+        motd: "",
+        currentPlayers: 0,
+      };
+    }
+  }
+
+  public async refreshAllServers() {
+    await this.fetchServersData("minecraft");
+    await this.fetchServersData("hytale");
+
+    const allServers = [
+      ...serversList.minecraft,
+      ...serversList.hytale
+    ];
+
+    await MongoDB.removeInvalidServers(allServers);
+  }
+
 
   public getServersData() {
     return serversData;
