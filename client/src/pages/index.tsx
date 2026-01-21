@@ -8,6 +8,7 @@ import { getCache } from "@/data/Cache";
 
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
+import { useCurrentList } from "@/contexts/CurrentListContext";
 
 type ServerData = {
   name: string;
@@ -24,17 +25,19 @@ type ServerData = {
 };
 
 type ServersData = {
-  java: ServerData[];
-  bedrock: ServerData[];
+  minecraft: ServerData[];
+  hytale: ServerData[];
 };
 
 export default function Home() {
   const [serversData, setServersData] = useState<ServersData>({
-    java: [],
-    bedrock: [],
+    minecraft: [],
+    hytale: [],
   });
 
+  // Context
   const { graphColor, setGraphColor } = useGraphColor();
+  const { currentList } = useCurrentList();
 
   useEffect(() => {
     const cachedGraphColor = getCache("graphColor");
@@ -63,9 +66,9 @@ export default function Home() {
 
   return (
     <Layout>
-      <main className="items-center pt-16 pb-24 ml-4">
+      <main className="items-center pt-32 pb-24">
         <div className="rounded-lg shadow-lg p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {serversData.java
+          {serversData[currentList]
             .sort((a, b) => {
               if (a.isOnline !== b.isOnline) {
                 return a.isOnline ? -1 : 1;
