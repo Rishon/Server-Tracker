@@ -1,5 +1,5 @@
 {
-  "java": [
+  "minecraft": [
     {
       "name": "TopStrix",
       "address": "play.topstrix.net"
@@ -65,7 +65,10 @@
       "address": "play.israelpractice.net"
     }
   ],
-  "bedrock": [
-    {}
+  "hytale": [
+    {
+      "name": "Hystrix",
+      "address": "play.hystrix.gg"
+    }
   ]
 }

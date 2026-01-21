@@ -38,9 +38,9 @@ type MotdData = {
   text?: string;
 };
 
-const serversData: { java: ServerInfo[]; bedrock: ServerInfo[] } = {
-  java: [],
-  bedrock: [],
+const serversData: { minecraft: ServerInfo[]; hytale: ServerInfo[] } = {
+  minecraft: [],
+  hytale: [],
 };
 
 class StatusChecker {
@@ -54,7 +54,7 @@ class StatusChecker {
       try {
         const data = await ping(
           () => Promise.resolve({ hostname: address, port }),
-          { timeout: 1000 * 15 }
+          { timeout: 1000 }
         );
 
         const motd = data.description as MotdData;
@@ -93,44 +93,54 @@ class StatusChecker {
 
 
   public async fetchServersData() {
-    let startTime = new Date().getTime();
+    const startTime = Date.now();
     console.log("Fetching servers data...");
 
-    serversData.java.length = 0;
+    serversData.minecraft.length = 0;
 
-    const serverMap = new Map<string, any>();
-
-    const list = serversList.java as {
+    const list = serversList.minecraft as {
       name: string;
       address: string;
       port: number;
     }[];
 
-    await MongoDB.removeInvalidServers(serversList.java);
+    await MongoDB.removeInvalidServers(list);
 
-    for (const server of list) {
+    const tasks = list.map((server) =>
+      this.fetchSingleServer(server)
+    );
+
+    const results = await Promise.allSettled(tasks);
+
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value) {
+        serversData.minecraft.push(result.value);
+      }
+    }
+
+    const endTime = Date.now();
+    console.log(
+      `Fetched servers data in ${endTime - startTime}ms (${Math.floor(
+        (endTime - startTime) / 1000
+      )}s)`
+    );
+  }
+
+  private async fetchSingleServer(server: {
+    name: string;
+    address: string;
+    port: number;
+  }) {
+    try {
       const info = await this.getServerInfo(server.address, server.port);
 
-      if (!info) {
-        console.error(`Error fetching server info for ${server.name}`);
-        continue;
-      }
+      let image = info.image || getFallbackImage();
+      let motd = info.motd || "Server Offline";
 
-      // Vanilla unknown_server.png
-      var image = info.image;
-
-      if (!image)
-        image = getFallbackImage();
-
-      // Motd
-      var motd = info.motd;
-      if (!motd) motd = "Server Offline";
-
-      // Ping server
       await MongoDB.pingServer(
         server.name,
         server.address,
-        server.port as number,
+        server.port,
         info.currentPlayers,
         image,
         motd
@@ -140,12 +150,10 @@ class StatusChecker {
         server.name,
         server.address
       );
-      if (!mongoServer) {
-        console.error(`Server ${server.name} not found in the database.`);
-        continue;
-      }
 
-      const serverData = {
+      if (!mongoServer) return null;
+
+      return {
         ...server,
         isOnline: info.isOnline,
         currentPlayers: info.currentPlayers,
@@ -155,20 +163,10 @@ class StatusChecker {
         motd: mongoServer.motd,
         pings: mongoServer.ping,
       };
-
-      const key = `${server.address}:${server.port}`;
-
-      serverMap.set(key, serverData);
+    } catch (err) {
+      console.error(`Failed fetching ${server.name}`, err);
+      return null;
     }
-
-    serversData.java.push(...serverMap.values());
-
-    const endTime = Date.now();
-    console.log(
-      `Fetched servers data in ${endTime - startTime}ms (${Math.floor(
-        (endTime - startTime) / 1000
-      )}s)`
-    );
   }
 
   public getServersData() {
