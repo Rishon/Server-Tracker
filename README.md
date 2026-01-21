@@ -1,6 +1,6 @@
 # Server Tracker
 
-The Server Tracker is a web application that allows users to track Minecraft servers.
+The Server Tracker is a web application that allows users to track Minecraft & Hytale servers.
 
 ## Local Development
 
