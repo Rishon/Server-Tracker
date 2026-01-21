@@ -8,7 +8,7 @@ import MongoDB from "./MongoDB";
 import { ping } from "minecraft-server-ping";
 
 // Utils
-import { getFallbackImage } from "../utils/ImageData";
+import { getFallbackHytaleImage, getFallbackMCImage } from "../utils/ImageData";
 
 // Interfaces
 interface ServerData {
@@ -38,7 +38,9 @@ type MotdData = {
   text?: string;
 };
 
-const serversData: { minecraft: ServerInfo[]; hytale: ServerInfo[] } = {
+type Platform = "minecraft" | "hytale";
+
+const serversData: Record<Platform, ServerInfo[]> = {
   minecraft: [],
   hytale: [],
 };
@@ -91,14 +93,20 @@ class StatusChecker {
     };
   }
 
+  public async fetchAllServers() {
+    await Promise.all([
+      this.fetchServersData("minecraft"),
+      this.fetchServersData("hytale"),
+    ]);
+  }
 
-  public async fetchServersData() {
+  public async fetchServersData(platform: Platform) {
     const startTime = Date.now();
-    console.log("Fetching servers data...");
+    console.log(`Fetching ${platform} servers data...`);
 
-    serversData.minecraft.length = 0;
+    serversData[platform].length = 0;
 
-    const list = serversList.minecraft as {
+    const list = serversList[platform] as {
       name: string;
       address: string;
       port: number;
@@ -107,35 +115,44 @@ class StatusChecker {
     await MongoDB.removeInvalidServers(list);
 
     const tasks = list.map((server) =>
-      this.fetchSingleServer(server)
+      this.fetchSingleServer(server, platform)
     );
 
     const results = await Promise.allSettled(tasks);
 
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
-        serversData.minecraft.push(result.value);
+        serversData[platform].push(result.value);
       }
     }
 
     const endTime = Date.now();
     console.log(
-      `Fetched servers data in ${endTime - startTime}ms (${Math.floor(
-        (endTime - startTime) / 1000
-      )}s)`
+      `Fetched ${platform} servers in ${endTime - startTime}ms`
     );
   }
 
-  private async fetchSingleServer(server: {
-    name: string;
-    address: string;
-    port: number;
-  }) {
+
+  private async fetchSingleServer(
+    server: {
+      name: string;
+      address: string;
+      port: number;
+    },
+    platform: Platform
+  ) {
     try {
       const info = await this.getServerInfo(server.address, server.port);
 
-      let image = info.image || getFallbackImage();
-      let motd = info.motd || "Server Offline";
+      let image;
+
+      if (platform === "hytale") { // For now until we get Hytale icons
+        image = getFallbackHytaleImage();
+      } else {
+        image = info.image || getFallbackMCImage();
+      }
+
+      const motd = info.motd || "Server Offline";
 
       await MongoDB.pingServer(
         server.name,
@@ -143,18 +160,19 @@ class StatusChecker {
         server.port,
         info.currentPlayers,
         image,
-        motd
+        motd,
+        platform
       );
 
       const mongoServer = await MongoDB.getServerData(
-        server.name,
-        server.address
+        server.address,
       );
 
       if (!mongoServer) return null;
 
       return {
         ...server,
+        platform,
         isOnline: info.isOnline,
         currentPlayers: info.currentPlayers,
         maxPlayers: mongoServer.maxPlayers,
@@ -164,7 +182,7 @@ class StatusChecker {
         pings: mongoServer.ping,
       };
     } catch (err) {
-      console.error(`Failed fetching ${server.name}`, err);
+      console.error(`[${platform}] Failed fetching ${server.name}`, err);
       return null;
     }
   }

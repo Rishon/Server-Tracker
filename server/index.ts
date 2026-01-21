@@ -69,11 +69,11 @@ async function init() {
   await MongoDB.connect(MONGODB_URL);
 
   // Fetch servers data initially
-  await statusChecker.fetchServersData();
+  await statusChecker.fetchAllServers();
 
   // Update every minute the servers
   setInterval(async () => {
-    await statusChecker.fetchServersData().catch((err) => {
+    await statusChecker.fetchAllServers().catch((err) => {
       console.error("Error fetching servers data", err);
     });
   }, 1000 * 60);
