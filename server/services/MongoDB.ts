@@ -34,7 +34,7 @@ class MongoService {
     motd: String,
     platform: Platform
   ) {
-    let server = await ServerModel.findOne({ address, platform });
+    let server = await MongoService.getServerData(address);
     let currentDateTime = new Date().getTime() as Number;
 
     if (!server) {
@@ -55,7 +55,7 @@ class MongoService {
     server.address = address;
 
     // Update port
-    if (port != 25565) server.port = port;
+    if (port != 25565 && port != 5520) server.port = port;
 
     server.ping.push({
       currentPlayers: currentPlayers,
