@@ -139,7 +139,7 @@ class StatusChecker {
       try {
         const data = await ping(
           () => Promise.resolve({ hostname: address, port }),
-          { timeout: 1000 }
+          { timeout: 3000 }
         );
 
         const motd = data.description as MotdData;
