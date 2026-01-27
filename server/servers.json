@@ -69,6 +69,15 @@
     {
       "name": "Hystrix",
       "address": "play.hystrix.gg"
+    },
+    {
+      "name": "HyPractice",
+      "address": "play.rishon.systems"
+    },
+    {
+      "name": "FrenzyTale",
+      "address": "play.frenzytale.com",
+      "port": 29700
     }
   ]
 }

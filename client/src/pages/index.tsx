@@ -34,6 +34,7 @@ export default function Home() {
     minecraft: [],
     hytale: [],
   });
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // Context
   const { graphColor, setGraphColor } = useGraphColor();
@@ -48,15 +49,22 @@ export default function Home() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/v1/servers`
         );
+
         if (!response.ok) {
           throw new Error("Failed to fetch servers");
         }
+
         const data = await response.json();
-        setServersData(data.data);
+
+        if (data?.data) {
+          setServersData(data.data);
+          setHasLoadedOnce(true);
+        }
       } catch (error) {
         console.error("Error fetching servers:", error);
       }
     };
+
 
     fetchServers();
 
@@ -80,7 +88,7 @@ export default function Home() {
               return b.name.localeCompare(a.name);
             });
 
-          if (visibleServers.length === 0) {
+          if (visibleServers.length === 0 && hasLoadedOnce) {
             return (
               <div className="text-center text-gray-400 py-12">
                 No servers to display
