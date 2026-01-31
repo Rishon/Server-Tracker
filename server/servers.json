@@ -76,8 +76,7 @@
     },
     {
       "name": "FrenzyTale",
-      "address": "play.frenzytale.com",
-      "port": 29700
+      "address": "play.frenzytale.com"
     }
   ]
 }
