@@ -36,6 +36,8 @@ export default function Home() {
   });
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(true);
+
   // Context
   const { graphColor, setGraphColor } = useGraphColor();
   const { currentList } = useCurrentList();
@@ -62,6 +64,8 @@ export default function Home() {
         }
       } catch (error) {
         console.error("Error fetching servers:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -88,7 +92,15 @@ export default function Home() {
               return b.name.localeCompare(a.name);
             });
 
-          if (visibleServers.length === 0 && hasLoadedOnce) {
+          if (isLoading && !hasLoadedOnce) {
+            return (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              </div>
+            );
+          }
+
+          if (visibleServers.length === 0 && hasLoadedOnce && !isLoading) {
             return (
               <div className="text-center text-gray-400 py-12">
                 No servers to display

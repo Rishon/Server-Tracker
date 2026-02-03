@@ -132,6 +132,19 @@ const Navbar = () => {
                 )}
               </Link>
             ))}
+
+            <Link
+              href="https://zeraph.app"
+              target="_blank"
+              className="group relative flex items-center gap-1.5 px-4 py-1.5 
+              rounded-full text-sm font-bold transition-all duration-300
+              text-[#f0cd31] hover:text-[#f7e07a] active:scale-95
+              bg-[#f0cd31]/5 border border-[#f0cd31]/30 hover:border-[#f0cd31]/60
+              shadow-[0_0_15px_-3px_rgba(240,205,49,0.2)] hover:shadow-[0_0_25px_-3px_rgba(240,205,49,0.5)]"
+            >
+              <span className="relative z-10">Try Zeraph</span>
+              <div className="absolute inset-0 rounded-full bg-[#f0cd31]/5 blur-md transition-opacity opacity-0 group-hover:opacity-100" />
+            </Link>
           </div>
 
           <div className="flex items-center gap-2">

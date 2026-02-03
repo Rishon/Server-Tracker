@@ -52,8 +52,6 @@ class StatusChecker {
     const startTime = Date.now();
     console.log(`Fetching ${platform} servers data...`);
 
-    serversData[platform].length = 0;
-
     const list = serversList[platform] as {
       name: string;
       address: string;
@@ -66,11 +64,14 @@ class StatusChecker {
 
     const results = await Promise.allSettled(tasks);
 
+    const newServers: ServerInfo[] = [];
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
-        serversData[platform].push(result.value);
+        newServers.push(result.value);
       }
     }
+
+    serversData[platform] = newServers;
 
     const endTime = Date.now();
     console.log(
