@@ -1,37 +1,30 @@
-name: Build and Deploy
+name: Deploy
 
 on:
-  push:
-    branches: [master]
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
 
 jobs:
-  build:
+  deploy:
+    name: Deploy to Server
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20"
-
-      - name: Install bun
-        run: |
-          npm install -g bun
-
-      - name: Build web client
-        run: |
-          cd client && bun install && bun run build
-
       - name: Deploy using SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: "${{ secrets.HOST }}"
+          username: "${{ secrets.USERNAME }}"
+          key: "${{ secrets.SSH_PRIVATE_KEY }}"
           port: 22
           script: |
+            set -e
             cd /home
 
             if [ ! -d "Server-Tracker" ]; then
@@ -40,21 +33,21 @@ jobs:
 
             cd Server-Tracker
             git reset --hard origin/master
-            git pull origin
+            git pull origin master
 
-            cd /home/Server-Tracker/client && bun install
+            cd client
+            bun install
             rm -f .env
-            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-
+            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" > .env
             bunx next build
 
-            cd /home/Server-Tracker/server && bun install
+            cd ../server
+            bun install
             rm -f .env
             echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
             echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> .env
 
-            cd /home/Server-Tracker
-
+            cd ..
             docker build ./client -t tracker-web
             docker build ./server -t tracker-server
 
