@@ -100,7 +100,7 @@ class StatusChecker {
           ? getFallbackHytaleImage()
           : info.image || getFallbackMCImage();
 
-      const motd = info.motd || "Server Offline";
+      const motd = info.motd || "";
 
       await MongoDB.pingServer(
         server.name,
@@ -183,7 +183,7 @@ class StatusChecker {
       const info = await query(address, port);
 
       return {
-        isOnline: true,
+        isOnline: !!(info.motd || info.currentPlayers),
         image: "", // Hytale does not provide icons yet
         motd: info.motd || "",
         currentPlayers: info.currentPlayers || 0,
