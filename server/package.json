@@ -1,7 +1,7 @@
 {
   "name": "server",
   "module": "index.ts",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
@@ -14,9 +14,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@hytaleone/query": "^1.0.1",
+    "@hytaleone/query": "^1.1.1",
     "dotenv": "^16.6.1",
     "minecraft-server-ping": "^0.1.4",
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.22.1"
   }
 }

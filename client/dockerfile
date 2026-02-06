@@ -1,22 +1,25 @@
-FROM ubuntu:latest
-
-# Update the package list
-RUN apt-get update && apt-get autoremove -y
+FROM node:22-slim
 
 # Environment variables
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    PATH="/root/.bun/bin:${PATH}"
 
 ARG FRONTEND_PORT
 ENV FRONTEND_PORT=$FRONTEND_PORT
 
 # Install some basic tools
-RUN apt-get install -y nano wget curl git unzip zip
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
-RUN bash nodesource_setup.sh
-RUN apt-get install -y nodejs
-
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    unzip \
+    zip \
+    nano \
+    wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+    
 # Set the working directory
 COPY . /app
 WORKDIR /app
@@ -26,6 +29,10 @@ RUN chmod +x /app/entrypoint.sh
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash
+
+# Add bun to PATH
+ENV BUN_INSTALL="/root/.bun"
+ENV PATH="$BUN_INSTALL/bin:$PATH"
 
 # Expose the port
 EXPOSE ${FRONTEND_PORT}
