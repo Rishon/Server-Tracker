@@ -50,11 +50,11 @@ const server = serve({
           case "servers":
             // Return servers data
             return ResponseHandler.successResponse(
-              statusChecker.getServersData()
+              statusChecker.getServersData(),
             );
           default:
             return ResponseHandler.invalidResponse(
-              ResponseHandler.INVALID_ROUTE
+              ResponseHandler.INVALID_ROUTE,
             );
         }
       }

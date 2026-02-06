@@ -6,7 +6,7 @@ import MongoDB from "./MongoDB";
 
 // Query
 import { ping } from "minecraft-server-ping";
-import { query } from '@hytaleone/query';
+import { query } from "@hytaleone/query";
 
 // Utils
 import { getFallbackHytaleImage, getFallbackMCImage } from "../utils/ImageData";
@@ -32,6 +32,11 @@ type ExtraObject = {
   color?: string;
   extra?: ExtraObject[];
   text?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underlined?: boolean;
+  strikethrough?: boolean;
+  obfuscated?: boolean;
 };
 
 type MotdData = {
@@ -47,7 +52,6 @@ const serversData: Record<Platform, ServerInfo[]> = {
 };
 
 class StatusChecker {
-
   public async fetchServersData(platform: Platform) {
     const startTime = Date.now();
     console.log(`Fetching ${platform} servers data...`);
@@ -58,8 +62,8 @@ class StatusChecker {
       port: number;
     }[];
 
-    const tasks = list.map(server =>
-      this.fetchSingleServer(server, platform)
+    const tasks = list.map((server) =>
+      this.fetchSingleServer(server, platform),
     );
 
     const results = await Promise.allSettled(tasks);
@@ -74,9 +78,7 @@ class StatusChecker {
     serversData[platform] = newServers;
 
     const endTime = Date.now();
-    console.log(
-      `Fetched ${platform} servers in ${endTime - startTime}ms`
-    );
+    console.log(`Fetched ${platform} servers in ${endTime - startTime}ms`);
   }
 
   private async fetchSingleServer(
@@ -85,7 +87,7 @@ class StatusChecker {
       address: string;
       port: number;
     },
-    platform: Platform
+    platform: Platform,
   ) {
     try {
       const info =
@@ -107,7 +109,7 @@ class StatusChecker {
         info.currentPlayers,
         image,
         motd,
-        platform
+        platform,
       );
 
       const mongoServer = await MongoDB.getServerData(server.address);
@@ -132,7 +134,7 @@ class StatusChecker {
 
   private async getMinecraftServerInfo(
     address: string,
-    port: number = 25565
+    port: number = 25565,
   ): Promise<ServerData> {
     const MAX_RETRIES = 3;
 
@@ -140,17 +142,15 @@ class StatusChecker {
       try {
         const data = await ping(
           () => Promise.resolve({ hostname: address, port }),
-          { timeout: 3000 }
+          { timeout: 3000 },
         );
 
-        const motd = data.description as MotdData;
-        const colorTextMap: string[] = [];
-        extractData(motd, colorTextMap);
+        const motd = extractData(data.description as MotdData);
 
         return {
           isOnline: true,
           image: data.favicon || "",
-          motd: colorTextMap.join(" "),
+          motd: motd,
           currentPlayers: data.players.online,
         };
       } catch {
@@ -177,9 +177,8 @@ class StatusChecker {
 
   private async getHytaleServerInfo(
     address: string,
-    port: number = 5520
+    port: number = 5520,
   ): Promise<ServerData> {
-
     try {
       const info = await query(address, port);
 
@@ -203,30 +202,75 @@ class StatusChecker {
     await this.fetchServersData("minecraft");
     await this.fetchServersData("hytale");
 
-    const allServers = [
-      ...serversList.minecraft,
-      ...serversList.hytale
-    ];
+    const allServers = [...serversList.minecraft, ...serversList.hytale];
 
     await MongoDB.removeInvalidServers(allServers);
   }
-
 
   public getServersData() {
     return serversData;
   }
 }
 
-function extractData(obj: ExtraObject, colorTextMap: string[] = []): string {
-  let result = obj.text ? obj.text : "";
+const colorCodes: Record<string, string> = {
+  black: "0",
+  dark_blue: "1",
+  dark_green: "2",
+  dark_aqua: "3",
+  dark_red: "4",
+  dark_purple: "5",
+  gold: "6",
+  gray: "7",
+  dark_gray: "8",
+  blue: "9",
+  green: "a",
+  aqua: "b",
+  red: "c",
+  light_purple: "d",
+  yellow: "e",
+  white: "f",
+  obfuscated: "k",
+  bold: "l",
+  strikethrough: "m",
+  underlined: "n",
+  italic: "o",
+  reset: "r",
+};
 
-  if (obj.color && obj.text) {
-    colorTextMap.push(`${obj.color}:${obj.text}`);
+function extractData(obj: ExtraObject): string {
+  let result = "";
+
+  if (obj.color) {
+    if (obj.color.startsWith("#")) {
+      const hex = obj.color.substring(1).split("");
+      result += "§x" + hex.map((c) => `§${c}`).join("");
+    } else if (colorCodes[obj.color]) {
+      result += `§${colorCodes[obj.color]}`;
+    }
+  }
+
+  // Handle formatting fields
+  const formatKeys = [
+    "bold",
+    "italic",
+    "underlined",
+    "strikethrough",
+    "obfuscated",
+  ] as const;
+  for (const key of formatKeys) {
+    if (obj[key]) {
+      const code = colorCodes[key];
+      if (code) result += `§${code}`;
+    }
+  }
+
+  if (obj.text) {
+    result += obj.text;
   }
 
   if (obj.extra && Array.isArray(obj.extra)) {
     for (const extraObj of obj.extra) {
-      result += extractData(extraObj, colorTextMap);
+      result += extractData(extraObj);
     }
   }
 

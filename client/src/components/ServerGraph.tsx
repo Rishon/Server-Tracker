@@ -5,11 +5,10 @@ import Image from "next/image";
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 
 // Icons
-import { FaCopy, FaEye } from "react-icons/fa";
+import { FaCopy } from "react-icons/fa";
 
 // Components
 import Snackbar from "@/components/Snackbar";
-import { getCache } from "@/data/Cache";
 import MotdTranslate from "./utils/MotdTranslate";
 
 export default function ServerGraph({
@@ -42,7 +41,7 @@ export default function ServerGraph({
   // Snackbar
   const [notification, setNotification] = useState<string | null>(null);
   const [snackbarType, setSnackbarType] = useState<"success" | "error">(
-    "success"
+    "success",
   );
   const [showSnackbar, setShowSnackbar] = useState(false);
 
@@ -52,7 +51,6 @@ export default function ServerGraph({
   };
 
   // Motd
-  const [toggleMotd, setToggleMotd] = useState<boolean>(false);
   const [motdMessage, setMotdMessage] = useState<string>("");
 
   // Hover state
@@ -90,7 +88,7 @@ export default function ServerGraph({
     const height = 95;
     const maxPingPlayers = Math.max(
       ...pings.map((p) => p.currentPlayers),
-      maxPlayers
+      maxPlayers,
     );
 
     if (maxPingPlayers === 0) return `M0,${height} ${dynamicWidth},${height} Z`;
@@ -116,17 +114,17 @@ export default function ServerGraph({
       setHoverX(x);
       setHoverData(closestData);
     },
-    [pings, maxGraphWidth]
+    [pings, maxGraphWidth],
   );
 
   // Calculate peak player position
   const calculatePeakPlayerPosition = (
     pings: Array<{ currentPlayers: number; timestamp: number }>,
     maxPlayers: number,
-    maxGraphWidth: number
+    maxGraphWidth: number,
   ) => {
     const peakIndex = pings.findIndex(
-      (ping: any) => ping.currentPlayers === maxPlayers
+      (ping: any) => ping.currentPlayers === maxPlayers,
     );
     if (peakIndex !== -1) {
       const width = Math.min(pings.length, maxPings);
@@ -143,13 +141,14 @@ export default function ServerGraph({
 
   return (
     <div
-      className={`items-left justify-center p-4 ${isOnline
-        ? "bg-[#0f0f10]"
-        : "bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
-        } border ${isOnline ? "border-[#2f2f2f]" : "border-[#3d2a2a]"
-        } rounded-lg shadow-lg relative`}
+      className={`items-left justify-center p-4 ${
+        isOnline
+          ? "bg-[#0f0f10]"
+          : "bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
+      } border ${
+        isOnline ? "border-[#2f2f2f]" : "border-[#3d2a2a]"
+      } rounded-lg shadow-lg relative`}
     >
-
       {!isOnline && (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,100,100,0.05),rgba(0,0,0,0.6))] mix-blend-overlay pointer-events-none" />
       )}
@@ -174,22 +173,11 @@ export default function ServerGraph({
         />
 
         <div className="absolute right-4 top-4 flex flex-row gap-2 flex-nowrap">
-          {getCache("experimental") && (
-            <button
-              className="text-lg sm:text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-2 sm:p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
-              onClick={() => {
-                setToggleMotd(!toggleMotd);
-              }}
-            >
-              <FaEye />
-            </button>
-          )}
-
           <button
             className="text-lg sm:text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-2 sm:p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
             onClick={() => {
               navigator.clipboard.writeText(
-                `${ipAddress}${port ? `:${port}` : ""}`
+                `${ipAddress}${port ? `:${port}` : ""}`,
               );
               setNotification("Copied to clipboard!");
               setSnackbarType("success");
@@ -210,13 +198,11 @@ export default function ServerGraph({
       </div>
 
       {/* Motd */}
-      {toggleMotd && getCache("experimental") && (
-        <div className="text-center mt-4 lg:text-left">
-          <p className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:pb-4">
-            <MotdTranslate motd={motdMessage} />
-          </p>
+      <div className="mt-4 min-h-[5rem] max-h-[5rem] overflow-y-auto border-b border-[#2f2f2f] pb-2 text-center lg:text-left">
+        <div className="text-md text-gray-400">
+          <MotdTranslate motd={motdMessage} />
         </div>
-      )}
+      </div>
 
       {/* Graph */}
       <div
@@ -251,13 +237,13 @@ export default function ServerGraph({
                 x1={calculatePeakPlayerPosition(
                   pings,
                   maxPlayers,
-                  maxGraphWidth
+                  maxGraphWidth,
                 )}
                 y1="0"
                 x2={calculatePeakPlayerPosition(
                   pings,
                   maxPlayers,
-                  maxGraphWidth
+                  maxGraphWidth,
                 )}
                 y2="100%"
                 stroke="#d13e1d"

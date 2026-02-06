@@ -32,7 +32,7 @@ class MongoService {
     currentPlayers: Number,
     image: String,
     motd: String,
-    platform: Platform
+    platform: Platform,
   ) {
     let server = await MongoService.getServerData(address);
     let currentDateTime = new Date().getTime() as Number;
@@ -94,18 +94,14 @@ class MongoService {
 
   // Delete servers that are not in the servers list
   static async removeInvalidServers(serversList: Array<{ address: string }>) {
-    const validAddresses = new Set(
-      serversList.map(s => s.address)
-    );
+    const validAddresses = new Set(serversList.map((s) => s.address));
 
     await ServerModel.deleteMany({
-      address: { $nin: [...validAddresses] }
+      address: { $nin: [...validAddresses] },
     });
   }
 
-  static async getServerData(
-    address: String,
-  ) {
+  static async getServerData(address: String) {
     return ServerModel.findOne({ address });
   }
 }

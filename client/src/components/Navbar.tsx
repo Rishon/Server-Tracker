@@ -36,7 +36,7 @@ const Navbar = () => {
   // Snackbar
   const [notification, setNotification] = useState<string | null>(null);
   const [snackbarType, setSnackbarType] = useState<"success" | "error">(
-    "success"
+    "success",
   );
   const [showSnackbar, setShowSnackbar] = useState(false);
 
@@ -95,12 +95,12 @@ const Navbar = () => {
         />
       )}
 
-      <nav className="fixed top-4 left-1/2 z-30 w-[95%] max-w-6xl -translate-x-1/2
+      <nav
+        className="fixed top-4 left-1/2 z-30 w-[95%] max-w-6xl -translate-x-1/2
   rounded-2xl border border-white/10
-  bg-[#0f0f10]/80 backdrop-blur-xl shadow-lg px-6 py-3">
-
+  bg-[#0f0f10]/80 backdrop-blur-xl shadow-lg px-6 py-3"
+      >
         <div className="flex items-center justify-between">
-
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/assets/icon.webp"
@@ -121,10 +121,11 @@ const Navbar = () => {
                 href={link.path}
                 target={link.target}
                 className={`relative text-sm font-medium transition-colors
-            ${currentPage === link.path
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white"
-                  }`}
+            ${
+              currentPage === link.path
+                ? "text-white"
+                : "text-gray-400 hover:text-white"
+            }`}
               >
                 {link.label}
                 {currentPage === link.path && (
@@ -148,14 +149,14 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2">
-
             <button
               onClick={() => {
-                const next = currentList === "minecraft" ? "hytale" : "minecraft";
+                const next =
+                  currentList === "minecraft" ? "hytale" : "minecraft";
                 setCurrentList(next);
                 sendSnackbar(
                   `${next.charAt(0).toUpperCase() + next.slice(1)} server list selected!`,
-                  "success"
+                  "success",
                 );
               }}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
@@ -182,14 +183,14 @@ const Navbar = () => {
               />
             </button>
 
-            <button
+            {/*             <button
               onClick={() => {
                 setShowExperimental(!showExperimental);
                 setCache("experimental", !showExperimental);
                 sendSnackbar(
                   `Experimental Features ${showExperimental ? "disabled" : "enabled"
                   }!`,
-                  "success"
+                  "success",
                 );
               }}
               className={`p-2 rounded-xl transition
@@ -199,8 +200,7 @@ const Navbar = () => {
                 }`}
             >
               <HiOutlineBeaker className="text-xl" />
-            </button>
-
+            </button> */}
           </div>
         </div>
 
@@ -215,7 +215,13 @@ const Navbar = () => {
             <HiOutlineExclamationTriangle className="text-base shrink-0" />
             <span>
               Hytale servers require the
-              <Link href={"https://github.com/HytaleOne/hytale-one-query-plugin/releases"} target="_blank" rel="noopener noreferrer">
+              <Link
+                href={
+                  "https://github.com/HytaleOne/hytale-one-query-plugin/releases"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <span className="mx-1 rounded bg-orange-400/20 px-1.5 py-0.5 font-mono text-orange-200">
                   HytaleOne Query Plugin
                 </span>
@@ -228,9 +234,10 @@ const Navbar = () => {
 
       {showColorPicker && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-[90%] max-w-md rounded-2xl border border-white/10
-      bg-[#0f0f10] p-6 shadow-xl space-y-6">
-
+          <div
+            className="w-[90%] max-w-md rounded-2xl border border-white/10
+      bg-[#0f0f10] p-6 shadow-xl space-y-6"
+          >
             <h3 className="text-lg font-semibold text-center">
               Select Graph Color
             </h3>
@@ -271,7 +278,6 @@ const Navbar = () => {
           </div>
         </div>
       )}
-
     </main>
   );
 };

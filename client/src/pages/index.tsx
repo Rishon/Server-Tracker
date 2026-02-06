@@ -49,7 +49,7 @@ export default function Home() {
     const fetchServers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/v1/servers`
+          `${process.env.NEXT_PUBLIC_API_URL}/v1/servers`,
         );
 
         if (!response.ok) {
@@ -68,7 +68,6 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-
 
     fetchServers();
 
@@ -131,6 +130,5 @@ export default function Home() {
         })()}
       </main>
     </Layout>
-
   );
 }

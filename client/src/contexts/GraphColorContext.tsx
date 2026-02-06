@@ -7,7 +7,7 @@ type GraphColorContextType = {
 };
 
 const GraphColorContext = createContext<GraphColorContextType | undefined>(
-  undefined
+  undefined,
 );
 
 /**
@@ -31,6 +31,6 @@ export const GraphColorProvider = ({ children }: { children: ReactNode }) => {
  */
 export const useGraphColor = () => {
   const context = useContext(GraphColorContext);
-  if (!context) return { graphColor: "#32D67A", setGraphColor: () => { } };
+  if (!context) return { graphColor: "#32D67A", setGraphColor: () => {} };
   return context;
 };
