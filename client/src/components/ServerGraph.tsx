@@ -200,11 +200,10 @@ export default function ServerGraph({
           {isOnline ? (
             <MotdTranslate motd={motdMessage} />
           ) : (
-            <div className="flex items-center justify-center gap-2 py-2 font-medium text-red-400/80 lg:justify-start">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
-              </span>
+            <div
+              className="flex items-center justify-center py-2 font-bold tracking-tight text-red-500/80 uppercase"
+              style={{ fontFamily: "'Inter', sans-serif", fontSize: '0.85rem' }}
+            >
               Server Offline
             </div>
           )}
