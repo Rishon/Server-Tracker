@@ -53,27 +53,19 @@
       "address": "play.ranbrealm.net"
     },
     {
-      "name": "Tropica",
-      "address": "play.tropica.fun"
-    },
-    {
-      "name": "Tropica",
-      "address": "play.tropica.fun"
-    },
-    {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
+    },
+    {
+      "name": "Tropica",
+      "address": "play.tropica.fun"
+    },
+    {
+      "name": "TopCraft",
+      "address": "topcraft.online"
     }
   ],
   "hytale": [
-    {
-      "name": "Hystrix",
-      "address": "play.hystrix.gg"
-    },
-    {
-      "name": "HyPractice",
-      "address": "play.rishon.systems"
-    },
     {
       "name": "FrenzyTale",
       "address": "play.frenzytale.com"
