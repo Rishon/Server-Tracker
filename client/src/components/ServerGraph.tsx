@@ -141,13 +141,10 @@ export default function ServerGraph({
 
   return (
     <div
-      className={`items-left justify-center p-4 ${
-        isOnline
-          ? "bg-[#0f0f10]"
-          : "bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
-      } border ${
-        isOnline ? "border-[#2f2f2f]" : "border-[#3d2a2a]"
-      } rounded-lg shadow-lg relative`}
+      className={`relative flex h-full flex-col justify-center border p-4 shadow-lg ${isOnline
+        ? "border-[#2f2f2f] bg-[#0f0f10]"
+        : "border-[#3d2a2a] bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
+        } rounded-lg`}
     >
       {!isOnline && (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,100,100,0.05),rgba(0,0,0,0.6))] mix-blend-overlay pointer-events-none" />
@@ -198,9 +195,19 @@ export default function ServerGraph({
       </div>
 
       {/* Motd */}
-      <div className="mt-4 min-h-[5rem] max-h-[5rem] overflow-y-auto border-b border-[#2f2f2f] pb-2 text-center lg:text-left">
+      <div className="mt-4 flex-grow overflow-y-auto border-b border-[#2f2f2f] pb-2 text-center lg:text-left">
         <div className="text-md text-gray-400">
-          <MotdTranslate motd={motdMessage} />
+          {isOnline ? (
+            <MotdTranslate motd={motdMessage} />
+          ) : (
+            <div className="flex items-center justify-center gap-2 py-2 font-medium text-red-400/80 lg:justify-start">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+              </span>
+              Server Offline
+            </div>
+          )}
         </div>
       </div>
 
