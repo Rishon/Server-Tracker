@@ -61,7 +61,7 @@ jobs:
           port: 22
           script: |
             set -e
-            cd /home
+            cd /opt/github
 
             if [ ! -d "Server-Tracker" ]; then
               gh repo clone Rishon/Server-Tracker
