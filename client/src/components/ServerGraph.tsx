@@ -141,10 +141,11 @@ export default function ServerGraph({
 
   return (
     <div
-      className={`relative flex h-full flex-col justify-center border p-4 shadow-lg ${isOnline
-        ? "border-[#2f2f2f] bg-[#0f0f10]"
-        : "border-[#3d2a2a] bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
-        } rounded-lg`}
+      className={`relative flex h-full flex-col justify-center border p-4 shadow-lg ${
+        isOnline
+          ? "border-[#2f2f2f] bg-[#0f0f10]"
+          : "border-[#3d2a2a] bg-gradient-to-br from-[#2a0e0e] via-[#3a1414] to-[#4a1a1a]"
+      } rounded-lg`}
     >
       {!isOnline && (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,100,100,0.05),rgba(0,0,0,0.6))] mix-blend-overlay pointer-events-none" />
@@ -202,7 +203,7 @@ export default function ServerGraph({
           ) : (
             <div
               className="flex items-center justify-center py-2 font-bold tracking-tight text-red-500/80 uppercase"
-              style={{ fontFamily: "'Inter', sans-serif", fontSize: '0.85rem' }}
+              style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.85rem" }}
             >
               Server Offline
             </div>
