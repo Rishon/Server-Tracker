@@ -121,7 +121,7 @@ class StatusChecker {
       // Calculate uptime percentage
       const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
       const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
-      const uptimePercentage = totalChecks > 0 ? (successfulChecks / totalChecks) * 100 : 0;
+      const uptimePercentage = totalChecks > 0 ? Math.round((successfulChecks / totalChecks) * 100) : 0;
 
       return {
         ...server,
