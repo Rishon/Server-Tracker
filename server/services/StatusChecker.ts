@@ -54,6 +54,28 @@ const serversData: Record<Platform, ServerInfo[]> = {
 };
 
 class StatusChecker {
+  private async withTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number,
+    errorMessage: string,
+  ): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error(errorMessage));
+      }, timeoutMs);
+
+      promise
+        .then((value) => {
+          clearTimeout(timeoutId);
+          resolve(value);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+  }
+
   public async fetchServersData(platform: Platform) {
     const startTime = Date.now();
     console.log(`Fetching ${platform} servers data...`);
@@ -121,7 +143,10 @@ class StatusChecker {
       // Calculate uptime percentage
       const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
       const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
-      const uptimePercentage = totalChecks > 0 ? Math.round((successfulChecks / totalChecks) * 100) : 0;
+      const uptimePercentage =
+        totalChecks > 0
+          ? Math.round((successfulChecks / totalChecks) * 100)
+          : 0;
 
       return {
         ...server,
@@ -149,13 +174,17 @@ class StatusChecker {
     address: string,
     port: number = 25565,
   ): Promise<ServerData> {
+    const ATTEMPT_TIMEOUT_MS = 5000;
     const MAX_RETRIES = 3;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const data = await ping(
-          () => Promise.resolve({ hostname: address, port }),
-          { timeout: 3000 },
+        const data = await this.withTimeout(
+          ping(() => Promise.resolve({ hostname: address, port }), {
+            timeout: ATTEMPT_TIMEOUT_MS,
+          }),
+          ATTEMPT_TIMEOUT_MS,
+          `Minecraft ping timed out for ${address}:${port}`,
         );
 
         const motd = extractData(data.description as MotdData);
@@ -195,25 +224,46 @@ class StatusChecker {
     address: string,
     port: number = 5520,
   ): Promise<ServerData> {
-    try {
-      const info = await query(address, port);
+    const ATTEMPT_TIMEOUT_MS = 5000;
+    const MAX_RETRIES = 3;
 
-      return {
-        isOnline: !!(info.motd || info.currentPlayers),
-        image: "", // Hytale does not provide icons yet
-        motd: info.motd || "",
-        currentPlayers: info.currentPlayers || 0,
-        version: "Hytale Beta",
-      };
-    } catch (e) {
-      return {
-        isOnline: false,
-        image: "",
-        motd: "",
-        currentPlayers: 0,
-        version: "Offline",
-      };
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const info = await this.withTimeout(
+          query(address, port),
+          ATTEMPT_TIMEOUT_MS,
+          `Hytale query timed out for ${address}:${port}`,
+        );
+
+        return {
+          isOnline: !!(info.motd || info.currentPlayers),
+          image: "", // Hytale does not provide icons yet
+          motd: info.motd || "",
+          currentPlayers: info.currentPlayers || 0,
+          version: "Hytale Beta",
+        };
+      } catch {
+        if (attempt === MAX_RETRIES) {
+          return {
+            isOnline: false,
+            image: "",
+            motd: "",
+            currentPlayers: 0,
+            version: "Offline",
+          };
+        }
+
+        await new Promise((r) => setTimeout(r, 500));
+      }
     }
+
+    return {
+      isOnline: false,
+      image: "",
+      motd: "",
+      currentPlayers: 0,
+      version: "Offline",
+    };
   }
 
   public async refreshAllServers() {
