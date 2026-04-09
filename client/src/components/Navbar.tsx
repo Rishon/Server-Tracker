@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 // React
 import { useEffect, useState } from "react";
-import { MdOutlineInvertColors } from "react-icons/md";
+import { HiCog6Tooth, HiClock, HiUsers, HiXMark } from "react-icons/hi2";
 
 // Cache
 import { setCache, getCache } from "@/data/Cache";
@@ -17,14 +17,16 @@ import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
 import { useCurrentList } from "@/contexts/CurrentListContext";
+import { useSortBy } from "@/contexts/SortByContext";
 
 const Navbar = () => {
   // Navigation
   const currentPage = usePathname();
-  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
 
   // Current graph color
   const { graphColor, setGraphColor } = useGraphColor();
+  const { sortBy, setSortBy } = useSortBy();
 
   // Current list
   const { currentList, setCurrentList } = useCurrentList();
@@ -170,13 +172,11 @@ const Navbar = () => {
             </button>
 
             <button
-              onClick={() => setShowColorPicker(!showColorPicker)}
+              onClick={() => setShowSettingsPopup(!showSettingsPopup)}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition flex items-center justify-center w-[40px] h-[40px]"
+              aria-label="Open settings"
             >
-              <MdOutlineInvertColors
-                className="text-xl"
-                style={{ color: graphColor }}
-              />
+              <HiCog6Tooth className="text-xl text-gray-200" />
             </button>
           </div>
         </div>
@@ -209,49 +209,104 @@ const Navbar = () => {
         )}
       </nav>
 
-      {showColorPicker && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      {showSettingsPopup && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+          onClick={() => setShowSettingsPopup(false)}
+        >
           <div
-            className="w-[90%] max-w-md rounded-2xl border border-white/10
-      bg-[#0f0f10] p-6 shadow-xl space-y-6"
+            className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-[#0a0a0a]/95 p-6 shadow-2xl backdrop-blur-xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold text-center">
-              Select Graph Color
-            </h3>
+            {/* Ambient Glow */}
+            <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-white/5 blur-[80px]" />
 
-            <div className="grid grid-cols-3 gap-4 place-items-center">
-              {graphColors.map((color) => (
-                <button
-                  key={color}
-                  className={`h-10 w-10 rounded-full transition transform hover:scale-110
-              ${color === graphColor ? "ring-2 ring-white" : ""}`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => {
-                    setColor(color);
-                    sendSnackbar("Graph color updated!", "success");
-                  }}
-                />
-              ))}
+            {/* Header */}
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="bg-gradient-to-br from-white to-gray-400 bg-clip-text text-xl font-bold text-transparent tracking-tight">
+                Preferences
+              </h3>
+              <button
+                onClick={() => setShowSettingsPopup(false)}
+                className="rounded-full p-2 text-gray-500 transition hover:bg-white/10 hover:text-white"
+                aria-label="Close"
+              >
+                <HiXMark className="text-xl" />
+              </button>
             </div>
 
-            <input
-              type="text"
-              className="w-full rounded-lg bg-white/5 px-4 py-2 text-center
-          text-sm outline-none ring-1 ring-white/10 focus:ring-white/30"
-              placeholder={graphColor}
-              onChange={(e) => {
-                if (!/^#[0-9A-F]{6}$/i.test(e.target.value)) return;
-                setColor(e.target.value);
-              }}
-            />
+            <div className="space-y-5">
+              {/* Color Section */}
+              <section className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 text-left">
+                <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Graph Color
+                </h4>
+                
+                <div className="mb-5 flex flex-wrap justify-center gap-3">
+                  {graphColors.map((color) => (
+                    <button
+                      key={color}
+                      className={`h-9 w-9 rounded-full transition-all duration-200 ease-out hover:scale-110 active:scale-95
+                        ${color === graphColor ? "ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0a]" : ""}`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        setColor(color);
+                        sendSnackbar("Graph color updated!", "success");
+                      }}
+                    />
+                  ))}
+                </div>
 
-            <button
-              onClick={() => setShowColorPicker(false)}
-              className="w-full rounded-lg bg-white/10 py-2 text-sm
-          hover:bg-white/20 transition"
-            >
-              Close
-            </button>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+                    <div 
+                      className="h-4 w-4 rounded border border-white/20 shadow-sm" 
+                      style={{ backgroundColor: graphColor }} 
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-white/10 bg-black/50 py-2.5 pl-10 pr-4 text-sm text-gray-200 outline-none transition placeholder:text-gray-600 focus:border-white/30 focus:ring-1 focus:ring-white/30"
+                    placeholder={graphColor}
+                    onChange={(e) => {
+                      if (!/^#[0-9A-F]{6}$/i.test(e.target.value)) return;
+                      setColor(e.target.value);
+                    }}
+                  />
+                </div>
+              </section>
+
+              {/* Sort Section */}
+              <section className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 text-left">
+                <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Sort Servers By
+                </h4>
+                <div className="flex w-full items-center justify-between overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1 shadow-inner">
+                  <button
+                    onClick={() => setSortBy("players")}
+                    className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                      sortBy === "players"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <HiUsers className="mr-2 text-sm sm:text-base" />
+                    Players
+                  </button>
+                  <button
+                    onClick={() => setSortBy("uptime")}
+                    className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                      sortBy === "uptime"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <HiClock className="mr-2 text-sm sm:text-base" />
+                    Uptime
+                  </button>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       )}

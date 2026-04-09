@@ -14,14 +14,8 @@ class MongoService {
       dbName: "tracker-db",
     } as mongoose.ConnectOptions;
 
-    await mongoose
-      .connect(uri, options)
-      .then(async () => {
-        console.log("Connected to MongoDB");
-      })
-      .catch((err) => {
-        console.error("Error connecting to MongoDB", err);
-      });
+    await mongoose.connect(uri, options);
+    console.log("Connected to MongoDB");
   }
 
   // Ping server

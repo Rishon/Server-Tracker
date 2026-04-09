@@ -1,7 +1,6 @@
 // Components
 import Layout from "@/components/Layout";
 import ServerGraph from "@/components/ServerGraph";
-import SortingControls from "@/components/SortingControls";
 import { useEffect, useState } from "react";
 
 // Cache
@@ -10,6 +9,7 @@ import { getCache } from "@/data/Cache";
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
 import { useCurrentList } from "@/contexts/CurrentListContext";
+import { useSortBy } from "@/contexts/SortByContext";
 
 type ServerData = {
   name: string;
@@ -42,11 +42,11 @@ export default function Home() {
   });
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [sortBy, setSortBy] = useState<"players" | "uptime">("players");
 
   // Context
   const { graphColor, setGraphColor } = useGraphColor();
   const { currentList } = useCurrentList();
+  const { sortBy } = useSortBy();
 
   useEffect(() => {
     const cachedGraphColor = getCache("graphColor");
@@ -88,9 +88,6 @@ export default function Home() {
           currentList === "hytale" ? "pt-56 sm:pt-40" : "pt-36 sm:pt-32"
         }`}
       >
-        {/* Sorting Controls */}
-        <SortingControls sortBy={sortBy} setSortBy={setSortBy} />
-
         {(() => {
           const visibleServers = serversData[currentList]
             .filter((server) => server.name !== "")

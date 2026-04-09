@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 // Context
 import { GraphColorProvider } from "@/contexts/GraphColorContext";
 import { CurrentListProvider } from "@/contexts/CurrentListContext";
+import { SortByProvider } from "@/contexts/SortByContext";
 
 export default function MyApp({
   Component,
@@ -16,7 +17,9 @@ export default function MyApp({
   return (
     <GraphColorProvider>
       <CurrentListProvider>
-        <Component {...pageProps} key={router.route} />;
+        <SortByProvider>
+          <Component {...pageProps} key={router.route} />;
+        </SortByProvider>
       </CurrentListProvider>
     </GraphColorProvider>
   );
