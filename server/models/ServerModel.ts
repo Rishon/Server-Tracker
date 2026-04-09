@@ -12,8 +12,11 @@ interface IServer extends Document {
   uptimeStats: {
     totalChecks: number;
     successfulChecks: number;
-    firstCheckAdded: Date;
+    firstCheckAdded: Number;
   };
+  dailyMetrics: Array<{ timestamp: Number; maxPlayers: Number; averagePlayers: Number }>;
+  last24hAveragePlayers: Number;
+  allTimeAveragePlayers: Number;
 }
 
 const serverSchema: Schema = new Schema({
@@ -28,8 +31,11 @@ const serverSchema: Schema = new Schema({
   uptimeStats: {
     totalChecks: { type: Number, default: 0 },
     successfulChecks: { type: Number, default: 0 },
-    firstCheckAdded: { type: Date, default: Date.now },
+    firstCheckAdded: { type: Number, default: Date.now },
   },
+  dailyMetrics: { type: Array, required: false, default: [] },
+  last24hAveragePlayers: { type: Number, required: false, default: 0 },
+  allTimeAveragePlayers: { type: Number, required: false, default: 0 },
 });
 
 const Server = mongoose.model<IServer>("Server", serverSchema);

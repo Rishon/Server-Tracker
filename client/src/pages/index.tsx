@@ -24,6 +24,10 @@ type ServerData = {
   totalPlayers: number;
   pings: any[];
   uptimePercentage?: number;
+  last24hAveragePlayers?: number;
+  allTimeAveragePlayers?: number;
+  dailyMetrics?: Array<{ timestamp: number; maxPlayers: number; averagePlayers: number }>;
+  version?: string;
 };
 
 type ServersData = {
@@ -139,6 +143,10 @@ export default function Home() {
                   totalPlayers={server.totalPlayers}
                   pings={server.pings}
                   graphColor={graphColor}
+                  uptimePercentage={server.uptimePercentage}
+                  last24hAveragePlayers={server.last24hAveragePlayers}
+                  allTimeAveragePlayers={server.allTimeAveragePlayers}
+                  version={server.version}
                 />
               ))}
             </div>

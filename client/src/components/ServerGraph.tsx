@@ -23,6 +23,10 @@ export default function ServerGraph({
   totalPlayers,
   pings,
   graphColor,
+  uptimePercentage,
+  last24hAveragePlayers,
+  allTimeAveragePlayers,
+  version,
 }: Readonly<{
   isOnline: boolean;
   image: string;
@@ -35,6 +39,10 @@ export default function ServerGraph({
   totalPlayers: number;
   pings: Array<{ currentPlayers: number; timestamp: number }>;
   graphColor: string;
+  uptimePercentage?: number;
+  last24hAveragePlayers?: number;
+  allTimeAveragePlayers?: number;
+  version?: string;
 }>) {
   const maxPings = 1440;
 
@@ -139,6 +147,15 @@ export default function ServerGraph({
     setHoverData(null);
   };
 
+  const cleanVersion = (ver?: string) => {
+    if (!ver) return "";
+    let cleaned = ver.replace(/[&§][0-9a-fk-or]/gi, "");
+    if (cleaned.length > 17) {
+      cleaned = cleaned.substring(0, 17) + "...";
+    }
+    return cleaned;
+  };
+
   return (
     <div
       className={`relative flex h-full flex-col justify-center border p-4 shadow-lg ${
@@ -187,7 +204,14 @@ export default function ServerGraph({
         </div>
 
         <div className="ml-3 -mt-1">
-          <h1 className="text-md font-semibold text-gray-300">{name}</h1>
+          <h1 className="text-md font-semibold text-gray-300 flex items-center gap-2">
+            {name}
+            {version && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#2f2f2f] text-gray-400 font-medium">
+                {cleanVersion(version)}
+              </span>
+            )}
+          </h1>
           <p className="text-md text-gray-500">
             {ipAddress}
             {port ? `:${port}` : ""}
@@ -196,7 +220,7 @@ export default function ServerGraph({
       </div>
 
       {/* Motd */}
-      <div className="mt-4 flex-grow overflow-y-auto border-b border-[#2f2f2f] pb-2 text-center lg:text-left">
+      <div className="mt-4 flex-grow overflow-y-auto pb-2 text-center lg:text-left">
         <div className="text-md text-gray-400">
           {isOnline ? (
             <MotdTranslate motd={motdMessage} />
@@ -214,7 +238,7 @@ export default function ServerGraph({
       {/* Graph */}
       <div
         ref={graphContainerRef}
-        className="flex items-center justify-center border-b border-[#2f2f2f] space-x-2 mt-2 bg-graph-black-dots bg-graph-pattern relative"
+        className="flex items-center justify-center border-t border-[#2f2f2f] space-x-2 pt-2 bg-graph-black-dots bg-graph-pattern relative"
       >
         <div className="w-full relative">
           <svg
@@ -314,19 +338,45 @@ export default function ServerGraph({
         </div>
       </div>
 
-      {/* Player Count */}
-      <div className="text-center mt-4 lg:text-left lg:flex lg:justify-between">
-        <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
+      {/* Player Count & Stats */}
+      <div className="text-center mt-4 text-xs lg:text-sm lg:text-left grid grid-cols-3 gap-y-4 gap-x-2 pb-2">
+        <div className="text-gray-400">
           <span className="text-green-500">◆</span> Current
-          <p className="text-md text-gray-600">{currentPlayers}</p>
+          <p className="text-gray-600 font-semibold">{currentPlayers}</p>
         </div>
-        <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
+        <div className="text-gray-400">
           <span className="text-cyan-500">◆</span> 24h Peak
-          <p className="text-md text-gray-600">{maxPlayers}</p>
+          <p className="text-gray-600 font-semibold">{maxPlayers}</p>
         </div>
-        <div className="text-md text-gray-400 border-b border-[#2f2f2f] pb-3 lg:w-1/2 lg:pb-4">
+        <div className="text-gray-400">
           <span className="text-pink-500">◆</span> All Time
-          <p className="text-md text-gray-600">{totalPlayers}</p>
+          <p className="text-gray-600 font-semibold">{totalPlayers}</p>
+        </div>
+        <div className="text-gray-400">
+          <span className="text-blue-500">◆</span> 24h Avg
+          <p className="text-gray-600 font-semibold">
+            {last24hAveragePlayers ?? "N/A"}
+          </p>
+        </div>
+        <div className="text-gray-400">
+          <span className="text-purple-500">◆</span> All Time Avg
+          <p className="text-gray-600 font-semibold">
+            {allTimeAveragePlayers ?? "N/A"}
+          </p>
+        </div>
+        <div className="text-gray-400">
+          <span className="text-yellow-500">◆</span> Uptime
+          <p
+            className={`font-semibold ${
+              (uptimePercentage ?? 0) > 95
+                ? "text-emerald-400"
+                : (uptimePercentage ?? 0) > 80
+                  ? "text-yellow-400"
+                  : "text-red-400"
+            }`}
+          >
+            {uptimePercentage ? `${uptimePercentage}%` : "N/A"}
+          </p>
         </div>
       </div>
     </div>

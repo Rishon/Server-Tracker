@@ -10,7 +10,7 @@ export default function SortingControls({
   setSortBy,
 }: SortingControlsProps) {
   return (
-    <div className="flex justify-center mt-8 mb-10 w-full px-4 relative z-10">
+    <div className="flex justify-center mb-10 w-full px-4 relative z-10">
       <div className="flex w-full max-w-[360px] sm:w-auto sm:max-w-none sm:inline-flex justify-between items-center bg-black/40 backdrop-blur-md rounded-full p-1 sm:p-1.5 border border-zinc-800 shadow-xl overflow-hidden">
         <button
           onClick={() => setSortBy("players")}
