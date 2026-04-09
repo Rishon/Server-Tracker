@@ -1,6 +1,7 @@
 // Components
 import Layout from "@/components/Layout";
 import ServerGraph from "@/components/ServerGraph";
+import SortingControls from "@/components/SortingControls";
 import { useEffect, useState } from "react";
 
 // Cache
@@ -22,6 +23,11 @@ type ServerData = {
   maxPlayers: number;
   totalPlayers: number;
   pings: any[];
+  uptimePercentage?: number;
+  last24hAveragePlayers?: number;
+  allTimeAveragePlayers?: number;
+  dailyMetrics?: Array<{ timestamp: number; maxPlayers: number; averagePlayers: number }>;
+  version?: string;
 };
 
 type ServersData = {
@@ -35,8 +41,8 @@ export default function Home() {
     hytale: [],
   });
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<"players" | "uptime">("players");
 
   // Context
   const { graphColor, setGraphColor } = useGraphColor();
@@ -77,7 +83,14 @@ export default function Home() {
 
   return (
     <Layout>
-      <main className="items-center pt-32 pb-24">
+      <main
+        className={`items-center transition-all duration-300 pb-24 ${
+          currentList === "hytale" ? "pt-56 sm:pt-40" : "pt-36 sm:pt-32"
+        }`}
+      >
+        {/* Sorting Controls */}
+        <SortingControls sortBy={sortBy} setSortBy={setSortBy} />
+
         {(() => {
           const visibleServers = serversData[currentList]
             .filter((server) => server.name !== "")
@@ -85,10 +98,17 @@ export default function Home() {
               if (a.isOnline !== b.isOnline) {
                 return a.isOnline ? -1 : 1;
               }
-              if (b.currentPlayers !== a.currentPlayers) {
-                return b.currentPlayers - a.currentPlayers;
+
+              switch (sortBy) {
+                case "players":
+                  return b.currentPlayers - a.currentPlayers;
+                case "uptime":
+                  const aUptime = a.uptimePercentage || 0;
+                  const bUptime = b.uptimePercentage || 0;
+                  return bUptime - aUptime;
+                default:
+                  return 0;
               }
-              return b.name.localeCompare(a.name);
             });
 
           if (isLoading && !hasLoadedOnce) {
@@ -123,6 +143,10 @@ export default function Home() {
                   totalPlayers={server.totalPlayers}
                   pings={server.pings}
                   graphColor={graphColor}
+                  uptimePercentage={server.uptimePercentage}
+                  last24hAveragePlayers={server.last24hAveragePlayers}
+                  allTimeAveragePlayers={server.allTimeAveragePlayers}
+                  version={server.version}
                 />
               ))}
             </div>

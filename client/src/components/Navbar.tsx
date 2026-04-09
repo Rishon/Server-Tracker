@@ -16,7 +16,6 @@ import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
 // Context
 import { useGraphColor } from "@/contexts/GraphColorContext";
-import { HiOutlineBeaker } from "react-icons/hi";
 import { useCurrentList } from "@/contexts/CurrentListContext";
 
 const Navbar = () => {
@@ -29,9 +28,6 @@ const Navbar = () => {
 
   // Current list
   const { currentList, setCurrentList } = useCurrentList();
-
-  // Experimental
-  const [showExperimental, setShowExperimental] = useState(false);
 
   // Snackbar
   const [notification, setNotification] = useState<string | null>(null);
@@ -69,10 +65,7 @@ const Navbar = () => {
   useEffect(() => {
     const cachedGraphColor = getCache("graphColor");
     if (cachedGraphColor) setGraphColor(cachedGraphColor);
-
-    const cachedExperimental = getCache("experimental");
-    if (cachedExperimental) setShowExperimental(cachedExperimental);
-  }, [setGraphColor, setShowExperimental]);
+  }, [setGraphColor]);
 
   function setColor(color: string) {
     setCache("graphColor", color);
@@ -143,7 +136,7 @@ const Navbar = () => {
               bg-[#f0cd31]/5 border border-[#f0cd31]/30 hover:border-[#f0cd31]/60
               shadow-[0_0_15px_-3px_rgba(240,205,49,0.2)] hover:shadow-[0_0_25px_-3px_rgba(240,205,49,0.5)]"
             >
-              <span className="relative z-10">Try Zeraph</span>
+              <span className="relative z-10">Protect your server</span>
               <div className="absolute inset-0 rounded-full bg-[#f0cd31]/5 blur-md transition-opacity opacity-0 group-hover:opacity-100" />
             </Link>
           </div>
@@ -159,48 +152,32 @@ const Navbar = () => {
                   "success",
                 );
               }}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition flex items-center justify-center w-[40px] h-[40px]"
             >
-              <Image
-                src={
-                  currentList === "minecraft"
-                    ? "/assets/games/minecraft.webp"
-                    : "/assets/games/hytale.webp"
-                }
-                width={22}
-                height={22}
-                alt="Game Toggle"
-              />
+              <div className="relative w-[20px] h-[20px]">
+                <Image
+                  src={
+                    currentList === "minecraft"
+                      ? "/assets/games/minecraft.webp"
+                      : "/assets/games/hytale.webp"
+                  }
+                  fill
+                  alt="Game Toggle"
+                  className="object-contain"
+                  sizes="20px"
+                />
+              </div>
             </button>
 
             <button
               onClick={() => setShowColorPicker(!showColorPicker)}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition flex items-center justify-center w-[40px] h-[40px]"
             >
               <MdOutlineInvertColors
                 className="text-xl"
                 style={{ color: graphColor }}
               />
             </button>
-
-            {/*             <button
-              onClick={() => {
-                setShowExperimental(!showExperimental);
-                setCache("experimental", !showExperimental);
-                sendSnackbar(
-                  `Experimental Features ${showExperimental ? "disabled" : "enabled"
-                  }!`,
-                  "success",
-                );
-              }}
-              className={`p-2 rounded-xl transition
-          ${showExperimental
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-red-500/20 text-red-400"
-                }`}
-            >
-              <HiOutlineBeaker className="text-xl" />
-            </button> */}
           </div>
         </div>
 

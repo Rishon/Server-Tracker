@@ -17,6 +17,7 @@ interface ServerData {
   currentPlayers: Number;
   image: String;
   motd: String;
+  version?: String;
 }
 
 interface ServerInfo {
@@ -26,6 +27,7 @@ interface ServerInfo {
   currentPlayers: Number;
   image: String;
   motd: String;
+  version?: String;
 }
 
 type ExtraObject = {
@@ -110,10 +112,16 @@ class StatusChecker {
         image,
         motd,
         platform,
+        info.isOnline !== undefined ? (info.isOnline as boolean) : false,
       );
 
       const mongoServer = await MongoDB.getServerData(server.address);
       if (!mongoServer) return null;
+
+      // Calculate uptime percentage
+      const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
+      const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
+      const uptimePercentage = totalChecks > 0 ? (successfulChecks / totalChecks) * 100 : 0;
 
       return {
         ...server,
@@ -125,6 +133,11 @@ class StatusChecker {
         image: mongoServer.image,
         motd: mongoServer.motd,
         pings: mongoServer.ping,
+        uptimePercentage,
+        last24hAveragePlayers: mongoServer.last24hAveragePlayers,
+        allTimeAveragePlayers: mongoServer.allTimeAveragePlayers,
+        dailyMetrics: mongoServer.dailyMetrics,
+        version: info.version,
       };
     } catch (err) {
       console.error(`[${platform}] Failed fetching ${server.name}`, err);
@@ -152,6 +165,7 @@ class StatusChecker {
           image: data.favicon || "",
           motd: motd,
           currentPlayers: data.players.online,
+          version: data.version?.name || "Unknown",
         };
       } catch {
         if (attempt === MAX_RETRIES) {
@@ -160,6 +174,7 @@ class StatusChecker {
             image: "",
             motd: "",
             currentPlayers: 0,
+            version: "Offline",
           };
         }
 
@@ -172,6 +187,7 @@ class StatusChecker {
       image: "",
       motd: "",
       currentPlayers: 0,
+      version: "Offline",
     };
   }
 
@@ -187,6 +203,7 @@ class StatusChecker {
         image: "", // Hytale does not provide icons yet
         motd: info.motd || "",
         currentPlayers: info.currentPlayers || 0,
+        version: "Hytale Beta",
       };
     } catch (e) {
       return {
@@ -194,6 +211,7 @@ class StatusChecker {
         image: "",
         motd: "",
         currentPlayers: 0,
+        version: "Offline",
       };
     }
   }

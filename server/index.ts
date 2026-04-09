@@ -13,8 +13,7 @@ dotenv.config();
 
 // Environment Variables
 const PORT = process.env.BACKEND_PORT || 3005;
-const MONGODB_URL =
-  process.env.MONGODB_URL || "mongodb://localhost:27017/tracker-db";
+const MONGODB_URL = process.env.MONGODB_URL;
 
 // StatusChecker
 const statusChecker = new StatusChecker();
@@ -46,6 +45,27 @@ const server = serve({
 
       // Handle GET requests
       if (method === "GET") {
+        if (path.startsWith("servers/") && path.length > "servers/".length) {
+          const serverName = decodeURIComponent(path.split("/")[1]);
+          const allServers = statusChecker.getServersData();
+
+          let foundServer = null;
+          for (const [platform, servers] of Object.entries(allServers)) {
+            foundServer = (servers as any[]).find(
+              (s: any) => s.name.toLowerCase() === serverName.toLowerCase(),
+            );
+            if (foundServer) break;
+          }
+
+          if (foundServer) {
+            return ResponseHandler.successResponse(foundServer);
+          } else {
+            return ResponseHandler.invalidResponse(
+              ResponseHandler.SERVER_NOT_FOUND,
+            );
+          }
+        }
+
         switch (path) {
           case "servers":
             // Return servers data
@@ -66,7 +86,10 @@ const server = serve({
 
 async function init() {
   // Connect to MongoDB
-  await MongoDB.connect(MONGODB_URL);
+  await MongoDB.connect(MONGODB_URL || "").catch((err) => {
+    console.error("Error connecting to MongoDB", err);
+    process.exit(1);
+  });
 
   // Fetch servers data initially
   await statusChecker.refreshAllServers();

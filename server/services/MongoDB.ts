@@ -33,6 +33,7 @@ class MongoService {
     image: String,
     motd: String,
     platform: Platform,
+    isOnline: boolean = false,
   ) {
     let server = await MongoService.getServerData(address);
     let currentDateTime = new Date().getTime() as Number;
@@ -48,8 +49,26 @@ class MongoService {
         ping: [],
         image,
         motd,
+        uptimeStats: {
+          totalChecks: 0,
+          successfulChecks: 0,
+          firstCheckAdded: Date.now(),
+        },
+        dailyMetrics: [],
+        last24hAveragePlayers: 0,
       });
     }
+
+    // Update uptime stats
+    if (!server.uptimeStats) {
+      server.uptimeStats = {
+        totalChecks: 0,
+        successfulChecks: 0,
+        firstCheckAdded: Date.now(),
+      };
+    }
+    server.uptimeStats.totalChecks += 1;
+    if (isOnline) server.uptimeStats.successfulChecks += 1;
 
     // Update address
     server.address = address;
@@ -76,13 +95,64 @@ class MongoService {
     if (server.maxPlayers === undefined) server.maxPlayers = 0;
 
     let currentMaxPlayers = 0 as Number;
+    let total24hPlayers = 0 as number;
 
     server.ping.forEach((ping) => {
+      total24hPlayers += Number(ping.currentPlayers);
       if (ping.currentPlayers > currentMaxPlayers)
         currentMaxPlayers = ping.currentPlayers;
     });
 
     server.maxPlayers = currentMaxPlayers;
+    if (server.ping.length > 0) {
+      server.last24hAveragePlayers = Math.round(
+        total24hPlayers / server.ping.length,
+      );
+    } else {
+      server.last24hAveragePlayers = 0;
+    }
+
+    // Timestamp
+    const now = new Date();
+    const startOfDay = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    ).getTime();
+
+    if (!server.dailyMetrics) {
+      server.dailyMetrics = [];
+    }
+
+    const todayMetricIndex = server.dailyMetrics.findIndex(
+      (m: any) => m.timestamp === startOfDay,
+    );
+
+    if (todayMetricIndex !== -1) {
+      if (currentPlayers > server.dailyMetrics[todayMetricIndex].maxPlayers) {
+        server.dailyMetrics[todayMetricIndex].maxPlayers = currentPlayers;
+      }
+
+      server.dailyMetrics[todayMetricIndex].averagePlayers =
+        server.last24hAveragePlayers;
+      server.markModified("dailyMetrics");
+    } else {
+      server.dailyMetrics.push({
+        timestamp: startOfDay,
+        maxPlayers: currentPlayers,
+        averagePlayers: currentPlayers,
+      });
+    }
+
+    if (server.dailyMetrics && server.dailyMetrics.length > 0) {
+      const allTimeAvgSum = server.dailyMetrics.reduce(
+        (sum, m) => sum + (Number(m.averagePlayers) || 0),
+        0,
+      );
+      server.allTimeAveragePlayers = Math.round(
+        allTimeAvgSum / server.dailyMetrics.length,
+      );
+    } else {
+      server.allTimeAveragePlayers = currentPlayers;
+    }
 
     // Update total players
     if (server.totalPlayers === undefined) server.totalPlayers = 0;
