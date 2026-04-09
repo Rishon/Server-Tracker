@@ -9,6 +9,11 @@ interface IServer extends Document {
   image: String;
   motd: String;
   ping: Array<{ currentPlayers: Number; timestamp: Number }>;
+  uptimeStats: {
+    totalChecks: number;
+    successfulChecks: number;
+    firstCheckAdded: Date;
+  };
 }
 
 const serverSchema: Schema = new Schema({
@@ -20,6 +25,11 @@ const serverSchema: Schema = new Schema({
   image: { type: String, required: false },
   motd: { type: String, required: false },
   ping: { type: Array, required: false },
+  uptimeStats: {
+    totalChecks: { type: Number, default: 0 },
+    successfulChecks: { type: Number, default: 0 },
+    firstCheckAdded: { type: Date, default: Date.now },
+  },
 });
 
 const Server = mongoose.model<IServer>("Server", serverSchema);

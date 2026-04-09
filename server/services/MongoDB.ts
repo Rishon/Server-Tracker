@@ -33,6 +33,7 @@ class MongoService {
     image: String,
     motd: String,
     platform: Platform,
+    isOnline: boolean = false,
   ) {
     let server = await MongoService.getServerData(address);
     let currentDateTime = new Date().getTime() as Number;
@@ -48,8 +49,24 @@ class MongoService {
         ping: [],
         image,
         motd,
+        uptimeStats: {
+          totalChecks: 0,
+          successfulChecks: 0,
+          firstCheckAdded: new Date(),
+        },
       });
     }
+
+    // Update uptime stats
+    if (!server.uptimeStats) {
+      server.uptimeStats = {
+        totalChecks: 0,
+        successfulChecks: 0,
+        firstCheckAdded: new Date(),
+      };
+    }
+    server.uptimeStats.totalChecks += 1;
+    if (isOnline) server.uptimeStats.successfulChecks += 1;
 
     // Update address
     server.address = address;

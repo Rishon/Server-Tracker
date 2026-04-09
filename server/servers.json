@@ -65,10 +65,5 @@
       "address": "play.shotist.net"
     }
   ],
-  "hytale": [
-    {
-      "name": "FrenzyTale",
-      "address": "play.frenzytale.com"
-    }
-  ]
+  "hytale": []
 }

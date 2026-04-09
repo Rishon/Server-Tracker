@@ -110,10 +110,17 @@ class StatusChecker {
         image,
         motd,
         platform,
+        info.isOnline !== undefined ? (info.isOnline as boolean) : false,
       );
 
       const mongoServer = await MongoDB.getServerData(server.address);
       if (!mongoServer) return null;
+
+      // Calculate historical uptime percentage
+      const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
+      const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
+      const uptimePercentage =
+        totalChecks > 0 ? (successfulChecks / totalChecks) * 100 : 0;
 
       return {
         ...server,
@@ -125,6 +132,7 @@ class StatusChecker {
         image: mongoServer.image,
         motd: mongoServer.motd,
         pings: mongoServer.ping,
+        uptimePercentage,
       };
     } catch (err) {
       console.error(`[${platform}] Failed fetching ${server.name}`, err);

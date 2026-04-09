@@ -3,6 +3,7 @@ export default class ResponseHandler {
   static INVALID_METHOD = { message: "Invalid method", status: 405 };
   static INVALID_BODY = { message: "Invalid body", status: 400 };
   static INTERNAL_ERROR = { message: "Internal server error", status: 500 };
+  static SERVER_NOT_FOUND = { message: "Server not found", status: 404 };
   static CORS_HEADERS = {
     headers: {
       "Access-Control-Allow-Origin": "*",
