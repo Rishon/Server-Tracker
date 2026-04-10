@@ -59,7 +59,7 @@ export class ProtocolReader {
         portBuffer.writeUInt16BE(port, 0);
 
         const handshakeData = Buffer.concat([
-          this.writeVarInt(47), // Protocol version
+          this.writeVarInt(754), // Protocol version
           this.writeVarInt(hostBuffer.length), // Server Address Length
           hostBuffer, // Server Address
           portBuffer, // Server Port
