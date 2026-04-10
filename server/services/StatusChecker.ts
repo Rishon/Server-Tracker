@@ -362,9 +362,6 @@ function extractData(obj: ExtraObject | string): string {
   }
 
   if (obj.text) {
-    // Convert common embedded hex formats (e.g. &#ff0000, <#ff0000>, <color:#ff0000>) to Minecraft's §x format
-    // Also remove closing tags like </#ff0000> from Minimessage
-    // and convert legacy Bukkit ampersand color codes
     const parsedText = obj.text
       .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (match, hex) => {
         return (
