@@ -145,33 +145,6 @@ const Navbar = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                const next =
-                  currentList === "minecraft" ? "hytale" : "minecraft";
-                setCurrentList(next);
-                sendSnackbar(
-                  `${next.charAt(0).toUpperCase() + next.slice(1)} server list selected!`,
-                  "success",
-                );
-              }}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition flex items-center justify-center w-[40px] h-[40px]"
-            >
-              <div className="relative w-[20px] h-[20px]">
-                <Image
-                  src={
-                    currentList === "minecraft"
-                      ? "/assets/games/minecraft.webp"
-                      : "/assets/games/hytale.webp"
-                  }
-                  fill
-                  alt="Game Toggle"
-                  className="object-contain"
-                  sizes="20px"
-                />
-              </div>
-            </button>
-
-            <button
               onClick={() => setShowSettingsPopup(!showSettingsPopup)}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition flex items-center justify-center w-[40px] h-[40px]"
               aria-label="Open settings"
@@ -236,6 +209,58 @@ const Navbar = () => {
             </div>
 
             <div className="space-y-5">
+              {/* Game Section */}
+              <section className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 text-left">
+                <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Game
+                </h4>
+                <div className="flex w-full items-center justify-between overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1 shadow-inner">
+                  <button
+                    onClick={() => {
+                      setCurrentList("minecraft");
+                      sendSnackbar(
+                        "Minecraft server list selected!",
+                        "success",
+                      );
+                    }}
+                    className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                      currentList === "minecraft"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <Image
+                      src="/assets/games/minecraft.webp"
+                      width={16}
+                      height={16}
+                      alt="Minecraft"
+                      className="mr-2"
+                    />
+                    Minecraft
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentList("hytale");
+                      sendSnackbar("Hytale server list selected!", "success");
+                    }}
+                    className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                      currentList === "hytale"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <Image
+                      src="/assets/games/hytale.webp"
+                      width={16}
+                      height={16}
+                      alt="Hytale"
+                      className="mr-2"
+                    />
+                    Hytale
+                  </button>
+                </div>
+              </section>
+
               {/* Color Section */}
               <section className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 text-left">
                 <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
