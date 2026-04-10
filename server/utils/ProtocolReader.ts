@@ -2,6 +2,9 @@
 
 import * as net from "net";
 import * as dns from "dns";
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 export interface ServerStatus {
   version: {
     name: string;
@@ -25,17 +28,27 @@ export class ProtocolReader {
     port: number = 25565,
     timeout: number = 5000,
   ): Promise<ServerStatus> {
+    let connectHost = host;
+    let connectPort = port;
+
     try {
       const records = await dns.promises.resolveSrv(`_minecraft._tcp.${host}`);
       if (records && records.length > 0) {
         records.sort((a, b) => a.priority - b.priority || a.weight - b.weight);
-        host = records[0].name;
-        port = records[0].port;
+        connectHost = records[0].name;
+        connectPort = records[0].port;
       }
-    } catch (ignored) {}
+    } catch (err) {
+      if (
+        (err as NodeJS.ErrnoException).code !== "ENODATA" &&
+        (err as NodeJS.ErrnoException).code !== "ENOTFOUND"
+      ) {
+        console.log(`DNS SRV Error for ${host}:`, (err as any).message);
+      }
+    }
 
     return new Promise((resolve, reject) => {
-      const socket = net.createConnection(port, host);
+      const socket = net.createConnection(connectPort, connectHost);
       socket.setTimeout(timeout);
 
       let buffer = Buffer.alloc(0);
@@ -46,18 +59,16 @@ export class ProtocolReader {
         portBuffer.writeUInt16BE(port, 0);
 
         const handshakeData = Buffer.concat([
-          this.writeVarInt(-1), // Protocol version
+          this.writeVarInt(47), // Protocol version
           this.writeVarInt(hostBuffer.length), // Server Address Length
           hostBuffer, // Server Address
           portBuffer, // Server Port
-          this.writeVarInt(1),
+          this.writeVarInt(1), // Next state: 1 (Status)
         ]);
 
-        // Send Packet
-        socket.write(this.createPacket(0x00, handshakeData));
-
-        // Request Packet
-        socket.write(this.createPacket(0x00, Buffer.alloc(0)));
+        const packet1 = this.createPacket(0x00, handshakeData);
+        const packet2 = this.createPacket(0x00, Buffer.alloc(0));
+        socket.write(Buffer.concat([packet1, packet2]));
       });
 
       socket.on("data", (data: Buffer | string | any) => {
@@ -98,7 +109,9 @@ export class ProtocolReader {
                 resolve(result);
               }
             }
-          } catch (ignored) {}
+          } catch (err) {
+            console.error("Handshake Parse Error:", err);
+          }
         }
       });
 
