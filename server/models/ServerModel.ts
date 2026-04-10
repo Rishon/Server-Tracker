@@ -14,7 +14,11 @@ interface IServer extends Document {
     successfulChecks: number;
     firstCheckAdded: Number;
   };
-  dailyMetrics: Array<{ timestamp: Number; maxPlayers: Number; averagePlayers: Number }>;
+  dailyMetrics: Array<{
+    timestamp: Number;
+    maxPlayers: Number;
+    averagePlayers: Number;
+  }>;
   last24hAveragePlayers: Number;
   allTimeAveragePlayers: Number;
 }

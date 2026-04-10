@@ -5,7 +5,7 @@ import serversList from "../servers.json";
 import MongoDB from "./MongoDB";
 
 // Query
-import { ping } from "minecraft-server-ping";
+import { ProtocolReader } from "../utils/ProtocolReader";
 import { query } from "@hytaleone/query";
 
 // Utils
@@ -32,7 +32,7 @@ interface ServerInfo {
 
 type ExtraObject = {
   color?: string;
-  extra?: ExtraObject[];
+  extra?: (ExtraObject | string)[];
   text?: string;
   bold?: boolean;
   italic?: boolean;
@@ -42,7 +42,7 @@ type ExtraObject = {
 };
 
 type MotdData = {
-  extra?: ExtraObject[];
+  extra?: (ExtraObject | string)[];
   text?: string;
 };
 
@@ -76,33 +76,42 @@ class StatusChecker {
     });
   }
 
+  private isFetching: boolean = false;
+
   public async fetchServersData(platform: Platform) {
-    const startTime = Date.now();
-    console.log(`Fetching ${platform} servers data...`);
+    if (this.isFetching) return;
+    this.isFetching = true;
 
-    const list = serversList[platform] as {
-      name: string;
-      address: string;
-      port: number;
-    }[];
+    try {
+      const startTime = Date.now();
+      console.log(`Fetching ${platform} servers data...`);
 
-    const tasks = list.map((server) =>
-      this.fetchSingleServer(server, platform),
-    );
+      const list = serversList[platform] as {
+        name: string;
+        address: string;
+        port: number;
+      }[];
 
-    const results = await Promise.allSettled(tasks);
+      const newServers: ServerInfo[] = [];
 
-    const newServers: ServerInfo[] = [];
-    for (const result of results) {
-      if (result.status === "fulfilled" && result.value) {
-        newServers.push(result.value);
+      const tasks = list.map((server) =>
+        this.fetchSingleServer(server, platform),
+      );
+      const results = await Promise.allSettled(tasks);
+
+      for (const result of results) {
+        if (result.status === "fulfilled" && result.value) {
+          newServers.push(result.value);
+        }
       }
+
+      serversData[platform] = newServers;
+
+      const endTime = Date.now();
+      console.log(`Fetched ${platform} servers in ${endTime - startTime}ms`);
+    } finally {
+      this.isFetching = false;
     }
-
-    serversData[platform] = newServers;
-
-    const endTime = Date.now();
-    console.log(`Fetched ${platform} servers in ${endTime - startTime}ms`);
   }
 
   private async fetchSingleServer(
@@ -174,26 +183,29 @@ class StatusChecker {
     address: string,
     port: number = 25565,
   ): Promise<ServerData> {
-    const ATTEMPT_TIMEOUT_MS = 5000;
-    const MAX_RETRIES = 3;
+    const ATTEMPT_TIMEOUT_MS = 1000 * 10;
+    const MAX_RETRIES = 2;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const data = await this.withTimeout(
-          ping(() => Promise.resolve({ hostname: address, port }), {
-            timeout: ATTEMPT_TIMEOUT_MS,
-          }),
+          ProtocolReader.ping(address, port, ATTEMPT_TIMEOUT_MS),
           ATTEMPT_TIMEOUT_MS,
           `Minecraft ping timed out for ${address}:${port}`,
         );
 
-        const motd = extractData(data.description as MotdData);
+        const descriptionOpt =
+          typeof data.description === "object" && data.description !== null
+            ? data.description
+            : { text: data.description || "" };
+
+        const motd = extractData(descriptionOpt as MotdData);
 
         return {
           isOnline: true,
           image: data.favicon || "",
           motd: motd,
-          currentPlayers: data.players.online,
+          currentPlayers: data.players?.online || 0,
           version: data.version?.name || "Unknown",
         };
       } catch {
@@ -224,8 +236,8 @@ class StatusChecker {
     address: string,
     port: number = 5520,
   ): Promise<ServerData> {
-    const ATTEMPT_TIMEOUT_MS = 5000;
-    const MAX_RETRIES = 3;
+    const ATTEMPT_TIMEOUT_MS = 1000 * 3;
+    const MAX_RETRIES = 2;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -305,8 +317,25 @@ const colorCodes: Record<string, string> = {
   reset: "r",
 };
 
-function extractData(obj: ExtraObject): string {
+function extractData(obj: ExtraObject | string): string {
   let result = "";
+
+  if (typeof obj === "string") {
+    const parsedText = obj
+      .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (match, hex) => {
+        return (
+          "§x" +
+          hex
+            .split("")
+            .map((c: string) => `§${c}`)
+            .join("")
+        );
+      })
+      .replace(/<\/(?:#|color:#)[0-9a-fA-F]{6}>/gi, "")
+      .replace(/&([0-9a-fklmnor])/gi, "§$1")
+      .replace(/\\n/g, "\n");
+    return parsedText;
+  }
 
   if (obj.color) {
     if (obj.color.startsWith("#")) {
@@ -333,7 +362,23 @@ function extractData(obj: ExtraObject): string {
   }
 
   if (obj.text) {
-    result += obj.text;
+    // Convert common embedded hex formats (e.g. &#ff0000, <#ff0000>, <color:#ff0000>) to Minecraft's §x format
+    // Also remove closing tags like </#ff0000> from Minimessage
+    // and convert legacy Bukkit ampersand color codes
+    const parsedText = obj.text
+      .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (match, hex) => {
+        return (
+          "§x" +
+          hex
+            .split("")
+            .map((c: string) => `§${c}`)
+            .join("")
+        );
+      })
+      .replace(/<\/(?:#|color:#)[0-9a-fA-F]{6}>/gi, "")
+      .replace(/&([0-9a-fklmnor])/gi, "§$1")
+      .replace(/\\n/g, "\n");
+    result += parsedText;
   }
 
   if (obj.extra && Array.isArray(obj.extra)) {

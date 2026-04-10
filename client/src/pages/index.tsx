@@ -26,7 +26,11 @@ type ServerData = {
   uptimePercentage?: number;
   last24hAveragePlayers?: number;
   allTimeAveragePlayers?: number;
-  dailyMetrics?: Array<{ timestamp: number; maxPlayers: number; averagePlayers: number }>;
+  dailyMetrics?: Array<{
+    timestamp: number;
+    maxPlayers: number;
+    averagePlayers: number;
+  }>;
   version?: string;
 };
 

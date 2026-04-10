@@ -210,7 +210,7 @@ const Navbar = () => {
       </nav>
 
       {showSettingsPopup && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
           onClick={() => setShowSettingsPopup(false)}
         >
@@ -241,7 +241,7 @@ const Navbar = () => {
                 <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   Graph Color
                 </h4>
-                
+
                 <div className="mb-5 flex flex-wrap justify-center gap-3">
                   {graphColors.map((color) => (
                     <button
@@ -259,9 +259,9 @@ const Navbar = () => {
 
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-                    <div 
-                      className="h-4 w-4 rounded border border-white/20 shadow-sm" 
-                      style={{ backgroundColor: graphColor }} 
+                    <div
+                      className="h-4 w-4 rounded border border-white/20 shadow-sm"
+                      style={{ backgroundColor: graphColor }}
                     />
                   </div>
                   <input
