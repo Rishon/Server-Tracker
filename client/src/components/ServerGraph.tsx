@@ -99,7 +99,13 @@ export default function ServerGraph({
       maxPlayers,
     );
 
-    if (maxPingPlayers === 0) return `M0,${height} ${dynamicWidth},${height} Z`;
+    if (width === 0 || maxPingPlayers === 0)
+      return `M0,${height} ${dynamicWidth},${height} Z`;
+
+    if (width === 1) {
+      const y = height - (pings[0].currentPlayers / maxPingPlayers) * height;
+      return `M0,${height} 0,${y} ${dynamicWidth},${height} Z`;
+    }
 
     const points = pings.slice(0, width).map((ping, index) => {
       const x = (index / (width - 1)) * dynamicWidth;
@@ -117,6 +123,11 @@ export default function ServerGraph({
       const x = event.clientX - rect.left;
       const width = Math.min(pings.length, maxPings);
       const dynamicWidth = (width / maxPings) * maxGraphWidth;
+      if (width === 0 || dynamicWidth <= 0) {
+        setHoverX(null);
+        setHoverData(null);
+        return;
+      }
       const index = Math.round((x / dynamicWidth) * (width - 1));
       const closestData = pings[index];
       setHoverX(x);
@@ -131,12 +142,15 @@ export default function ServerGraph({
     maxPlayers: number,
     maxGraphWidth: number,
   ) => {
+    if (pings.length <= 1) return 0;
+
     const peakIndex = pings.findIndex(
       (ping: any) => ping.currentPlayers === maxPlayers,
     );
     if (peakIndex !== -1) {
       const width = Math.min(pings.length, maxPings);
       const dynamicWidth = (width / maxPings) * maxGraphWidth;
+      if (dynamicWidth <= 0 || width <= 1) return 0;
       return (peakIndex / (width - 1)) * dynamicWidth;
     }
     return 0;

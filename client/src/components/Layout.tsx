@@ -2,12 +2,10 @@
 import Head from "next/head";
 import Script from "next/script";
 
-// Analytics
-import { GoogleAnalytics } from "@next/third-parties/google";
-
 // Components
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -69,7 +67,7 @@ const RootLayout = ({ children, seo }: LayoutProps) => {
             name: "Server Tracker",
             author: {
               "@type": "Organization",
-              name: "Server Tracker",
+              name: "Sela Development",
             },
             description: "Track Minecraft servers",
             potentialAction: {
@@ -87,8 +85,8 @@ const RootLayout = ({ children, seo }: LayoutProps) => {
         <Footer />
       </main>
 
-      {/* Google Analytics */}
-      <GoogleAnalytics gaId={`G-08RW5HWFEH`} />
+      {/* Cookie Banner & Analytics */}
+      <CookieBanner />
     </div>
   );
 };

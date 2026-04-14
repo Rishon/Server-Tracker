@@ -133,7 +133,12 @@ const MotdTranslate: React.FC<{ motd: string }> = ({ motd }) => {
           }}
           className={part.obfuscated ? "animate-pulse" : ""}
         >
-          {part.text}
+          {part.text.split("\n").map((line, i, arr) => (
+            <React.Fragment key={i}>
+              {line}
+              {i !== arr.length - 1 && <br />}
+            </React.Fragment>
+          ))}
         </span>
       ))}
     </div>

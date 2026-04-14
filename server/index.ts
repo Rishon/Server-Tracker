@@ -85,11 +85,13 @@ const server = serve({
 });
 
 async function init() {
-  // Connect to MongoDB
-  await MongoDB.connect(MONGODB_URL || "").catch((err) => {
+  try {
+    // Connect to MongoDB
+    await MongoDB.connect(MONGODB_URL || "");
+  } catch (err) {
     console.error("Error connecting to MongoDB", err);
     process.exit(1);
-  });
+  }
 
   // Fetch servers data initially
   await statusChecker.refreshAllServers();
