@@ -52,6 +52,7 @@ export class ProtocolReader {
       socket.setTimeout(timeout);
 
       let buffer = Buffer.alloc(0);
+      let settled = false;
 
       socket.on("connect", () => {
         const hostBuffer = Buffer.from(host, "utf8");
@@ -103,8 +104,18 @@ export class ProtocolReader {
                 const jsonStr = body
                   .subarray(jsonStartOffset, jsonEndOffset)
                   .toString("utf8");
-                const result = JSON.parse(jsonStr) as ServerStatus;
 
+                let result: ServerStatus;
+                try {
+                  result = JSON.parse(jsonStr) as ServerStatus;
+                } catch (parseErr) {
+                  settled = true;
+                  socket.destroy();
+                  reject(parseErr);
+                  return;
+                }
+
+                settled = true;
                 socket.end();
                 resolve(result);
               }
@@ -116,13 +127,24 @@ export class ProtocolReader {
       });
 
       socket.on("timeout", () => {
+        settled = true;
         socket.destroy();
         reject(new Error(`Connection to ${host}:${port} timed out.`));
       });
 
       socket.on("error", (err) => {
+        settled = true;
         socket.destroy();
         reject(err);
+      });
+
+      socket.on("close", () => {
+        if (!settled) {
+          settled = true;
+          reject(
+            new Error(`Connection to ${host}:${port} closed before response.`),
+          );
+        }
       });
     });
   }

@@ -217,16 +217,16 @@ export default function ServerGraph({
           </button>
         </div>
 
-        <div className="ml-3 -mt-1">
-          <h1 className="text-md font-semibold text-gray-300 flex items-center gap-2">
-            {name}
+        <div className="ml-3 -mt-1 min-w-0 flex-1 pr-14 sm:pr-16">
+          <h1 className="text-md font-semibold text-gray-300 flex items-center gap-2 min-w-0">
+            <span className="min-w-0 truncate">{name}</span>
             {version && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#2f2f2f] text-gray-400 font-medium">
+              <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-md bg-[#2f2f2f] text-gray-400 font-medium">
                 {cleanVersion(version)}
               </span>
             )}
           </h1>
-          <p className="text-md text-gray-500">
+          <p className="text-md text-gray-500 truncate">
             {ipAddress}
             {port ? `:${port}` : ""}
           </p>

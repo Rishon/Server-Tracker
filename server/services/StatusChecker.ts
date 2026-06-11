@@ -78,6 +78,10 @@ class StatusChecker {
 
   private isFetching: boolean = false;
 
+  private static readonly OFFLINE_THRESHOLD = 3;
+  private failureStreak = new Map<string, number>();
+  private lastGood = new Map<string, any>();
+
   public async fetchServersData(platform: Platform) {
     if (this.isFetching) return;
     this.isFetching = true;
@@ -122,61 +126,113 @@ class StatusChecker {
     },
     platform: Platform,
   ) {
+    const key = server.address;
+
     try {
       const info =
         platform === "minecraft"
           ? await this.getMinecraftServerInfo(server.address, server.port)
           : await this.getHytaleServerInfo(server.address, server.port);
 
-      const image =
-        platform === "hytale"
-          ? getFallbackHytaleImage()
-          : info.image || getFallbackMCImage();
+      if (info.isOnline) {
+        this.failureStreak.set(key, 0);
+        const result = await this.recordAndBuild(server, platform, info, true);
+        if (result) this.lastGood.set(key, result);
+        return result;
+      }
 
-      const motd = info.motd || "";
+      const failures = (this.failureStreak.get(key) ?? 0) + 1;
+      this.failureStreak.set(key, failures);
 
-      await MongoDB.pingServer(
-        server.name,
-        server.address,
-        server.port,
-        info.currentPlayers,
-        image,
-        motd,
-        platform,
-        info.isOnline !== undefined ? (info.isOnline as boolean) : false,
-      );
+      const cached = this.lastGood.get(key);
+      if (failures < StatusChecker.OFFLINE_THRESHOLD && cached) {
+        console.warn(
+          `[${platform}] ${server.name} unreachable ` +
+            `(${failures}/${StatusChecker.OFFLINE_THRESHOLD}) - holding last-known-online`,
+        );
+        const graceInfo: ServerData = {
+          isOnline: false,
+          currentPlayers: cached.currentPlayers,
+          image: cached.image,
+          motd: cached.motd,
+          version: cached.version,
+        };
+        try {
+          const held = await this.recordAndBuild(
+            server,
+            platform,
+            graceInfo,
+            false,
+            true,
+          );
+          return held ?? cached;
+        } catch {
+          return cached;
+        }
+      }
 
-      const mongoServer = await MongoDB.getServerData(server.address);
-      if (!mongoServer) return null;
-
-      // Calculate uptime percentage
-      const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
-      const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
-      const uptimePercentage =
-        totalChecks > 0
-          ? Math.round((successfulChecks / totalChecks) * 100)
-          : 0;
-
-      return {
-        ...server,
-        platform,
-        isOnline: info.isOnline,
-        currentPlayers: info.currentPlayers,
-        maxPlayers: mongoServer.maxPlayers,
-        totalPlayers: mongoServer.totalPlayers,
-        image: mongoServer.image,
-        motd: mongoServer.motd,
-        pings: mongoServer.ping,
-        uptimePercentage,
-        last24hAveragePlayers: mongoServer.last24hAveragePlayers,
-        allTimeAveragePlayers: mongoServer.allTimeAveragePlayers,
-        dailyMetrics: mongoServer.dailyMetrics,
-        version: info.version,
-      };
+      return await this.recordAndBuild(server, platform, info, false);
     } catch (err) {
       console.error(`[${platform}] Failed fetching ${server.name}`, err);
-      return null;
+
+      const failures = (this.failureStreak.get(key) ?? 0) + 1;
+      this.failureStreak.set(key, failures);
+      const cached = this.lastGood.get(key);
+      if (failures < StatusChecker.OFFLINE_THRESHOLD && cached) return cached;
+      return cached ? { ...cached, isOnline: false } : null;
     }
+  }
+
+  private async recordAndBuild(
+    server: { name: string; address: string; port: number },
+    platform: Platform,
+    info: ServerData,
+    recordOnline: boolean,
+    displayOnline: boolean = recordOnline,
+  ) {
+    const image =
+      platform === "hytale"
+        ? getFallbackHytaleImage()
+        : info.image || getFallbackMCImage();
+
+    const motd = info.motd || "";
+
+    await MongoDB.pingServer(
+      server.name,
+      server.address,
+      server.port,
+      info.currentPlayers,
+      image,
+      motd,
+      platform,
+      recordOnline,
+    );
+
+    const mongoServer = await MongoDB.getServerData(server.address);
+    if (!mongoServer) return null;
+
+    // Calculate uptime percentage
+    const totalChecks = mongoServer.uptimeStats?.totalChecks || 1;
+    const successfulChecks = mongoServer.uptimeStats?.successfulChecks || 0;
+    const uptimePercentage =
+      totalChecks > 0 ? Math.round((successfulChecks / totalChecks) * 100) : 0;
+
+    return {
+      ...server,
+      platform,
+      isOnline: displayOnline,
+      currentPlayers: info.currentPlayers,
+      maxPlayers: mongoServer.maxPlayers,
+      totalPlayers: mongoServer.totalPlayers,
+      image: mongoServer.image,
+      motd: mongoServer.motd,
+      pings: mongoServer.ping,
+      uptimePercentage,
+      last24hAveragePlayers: mongoServer.last24hAveragePlayers,
+      allTimeAveragePlayers: mongoServer.allTimeAveragePlayers,
+      dailyMetrics: mongoServer.dailyMetrics,
+      version: info.version,
+    };
   }
 
   private async getMinecraftServerInfo(
@@ -184,7 +240,7 @@ class StatusChecker {
     port: number = 25565,
   ): Promise<ServerData> {
     const ATTEMPT_TIMEOUT_MS = 1000 * 10;
-    const MAX_RETRIES = 2;
+    const MAX_RETRIES = 3;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -219,7 +275,9 @@ class StatusChecker {
           };
         }
 
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) =>
+          setTimeout(r, 400 * attempt + Math.floor(Math.random() * 200)),
+        );
       }
     }
 

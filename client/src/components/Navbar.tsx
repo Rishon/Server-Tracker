@@ -5,7 +5,13 @@ import { usePathname } from "next/navigation";
 
 // React
 import { useEffect, useState } from "react";
-import { HiCog6Tooth, HiClock, HiUsers, HiXMark } from "react-icons/hi2";
+import {
+  HiCog6Tooth,
+  HiClock,
+  HiUsers,
+  HiXMark,
+  HiShieldCheck,
+} from "react-icons/hi2";
 
 // Cache
 import { setCache, getCache } from "@/data/Cache";
@@ -132,14 +138,13 @@ const Navbar = () => {
             <Link
               href="https://zeraph.app"
               target="_blank"
-              className="group relative flex items-center gap-1.5 px-4 py-1.5 
-              rounded-full text-sm font-bold transition-all duration-300
-              text-[#f0cd31] hover:text-[#f7e07a] active:scale-95
-              bg-[#f0cd31]/5 border border-[#f0cd31]/30 hover:border-[#f0cd31]/60
-              shadow-[0_0_15px_-3px_rgba(240,205,49,0.2)] hover:shadow-[0_0_25px_-3px_rgba(240,205,49,0.5)]"
+              className="group flex items-center gap-2 rounded-xl border border-white/10
+              bg-white/5 px-3.5 py-2 text-sm font-medium text-gray-300
+              transition-all duration-200 hover:border-[#f0cd31]/30
+              hover:bg-white/10 hover:text-white active:scale-95"
             >
-              <span className="relative z-10">Protect your server</span>
-              <div className="absolute inset-0 rounded-full bg-[#f0cd31]/5 blur-md transition-opacity opacity-0 group-hover:opacity-100" />
+              <HiShieldCheck className="text-base text-[#f0cd31] transition-transform duration-200 group-hover:scale-110" />
+              <span>Protect your server</span>
             </Link>
           </div>
 
