@@ -375,70 +375,80 @@ const colorCodes: Record<string, string> = {
   reset: "r",
 };
 
-function extractData(obj: ExtraObject | string): string {
-  let result = "";
+type EffectiveStyle = {
+  color?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underlined?: boolean;
+  strikethrough?: boolean;
+  obfuscated?: boolean;
+};
 
-  if (typeof obj === "string") {
-    const parsedText = obj
-      .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (match, hex) => {
-        return (
-          "§x" +
-          hex
-            .split("")
-            .map((c: string) => `§${c}`)
-            .join("")
-        );
-      })
-      .replace(/<\/(?:#|color:#)[0-9a-fA-F]{6}>/gi, "")
-      .replace(/&([0-9a-fklmnor])/gi, "§$1")
-      .replace(/\\n/g, "\n");
-    return parsedText;
+const formatKeys = [
+  "bold",
+  "italic",
+  "underlined",
+  "strikethrough",
+  "obfuscated",
+] as const;
+
+function colorToCodes(color?: string): string {
+  if (!color) return "";
+  if (/^#[0-9a-fA-F]{6}$/.test(color)) {
+    return (
+      "§x" +
+      color
+        .substring(1)
+        .split("")
+        .map((c) => `§${c}`)
+        .join("")
+    );
   }
+  return colorCodes[color] ? `§${colorCodes[color]}` : "";
+}
 
-  if (obj.color) {
-    if (obj.color.startsWith("#")) {
-      const hex = obj.color.substring(1).split("");
-      result += "§x" + hex.map((c) => `§${c}`).join("");
-    } else if (colorCodes[obj.color]) {
-      result += `§${colorCodes[obj.color]}`;
-    }
-  }
-
-  // Handle formatting fields
-  const formatKeys = [
-    "bold",
-    "italic",
-    "underlined",
-    "strikethrough",
-    "obfuscated",
-  ] as const;
+function styleToCodes(style: EffectiveStyle): string {
+  let out = "§r" + colorToCodes(style.color);
   for (const key of formatKeys) {
-    if (obj[key]) {
-      const code = colorCodes[key];
-      if (code) result += `§${code}`;
-    }
+    if (style[key]) out += `§${colorCodes[key]}`;
+  }
+  return out;
+}
+
+function parseInlineCodes(text: string): string {
+  return text
+    .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (_match, hex) =>
+      "§x" +
+      hex
+        .split("")
+        .map((c: string) => `§${c}`)
+        .join(""),
+    )
+    .replace(/<\/(?:#|color:#)[0-9a-fA-F]{6}>/gi, "")
+    .replace(/&([0-9a-fklmnor])/gi, "§$1")
+    .replace(/\\n/g, "\n");
+}
+
+function extractData(
+  obj: ExtraObject | string,
+  inherited: EffectiveStyle = {},
+): string {
+  if (typeof obj === "string") {
+    return obj ? styleToCodes(inherited) + parseInlineCodes(obj) : "";
   }
 
-  if (obj.text) {
-    const parsedText = obj.text
-      .replace(/(?:&#|<#|<color:#)([0-9a-fA-F]{6})>?/gi, (match, hex) => {
-        return (
-          "§x" +
-          hex
-            .split("")
-            .map((c: string) => `§${c}`)
-            .join("")
-        );
-      })
-      .replace(/<\/(?:#|color:#)[0-9a-fA-F]{6}>/gi, "")
-      .replace(/&([0-9a-fklmnor])/gi, "§$1")
-      .replace(/\\n/g, "\n");
-    result += parsedText;
+  const eff: EffectiveStyle = { ...inherited };
+  if (obj.color) eff.color = obj.color;
+  for (const key of formatKeys) {
+    if (obj[key] !== undefined) eff[key] = obj[key];
   }
+
+  let result = "";
+  if (obj.text) result += styleToCodes(eff) + parseInlineCodes(obj.text);
 
   if (obj.extra && Array.isArray(obj.extra)) {
-    for (const extraObj of obj.extra) {
-      result += extractData(extraObj);
+    for (const child of obj.extra) {
+      result += extractData(child, eff);
     }
   }
 

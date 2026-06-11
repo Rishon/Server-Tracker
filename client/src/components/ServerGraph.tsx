@@ -234,8 +234,8 @@ export default function ServerGraph({
       </div>
 
       {/* Motd */}
-      <div className="mt-4 flex-grow overflow-y-auto pb-2 text-center lg:text-left">
-        <div className="text-md text-gray-400">
+      <div className="mt-4 flex-grow flex items-center justify-center pb-2">
+        <div className="w-full text-md text-gray-400">
           {isOnline ? (
             <MotdTranslate motd={motdMessage} />
           ) : (
