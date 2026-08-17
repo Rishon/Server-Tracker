@@ -17,6 +17,6 @@
     "@hytaleone/query": "^1.1.1",
     "dotenv": "^16.6.1",
     "minecraft-server-ping": "^0.1.4",
-    "mongoose": "^8.23.0"
+    "mongoose": "^8.24.3"
   }
 }
