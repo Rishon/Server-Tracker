@@ -25,10 +25,6 @@
       "address": "play.scapecraft.net"
     },
     {
-      "name": "IsraelMC",
-      "address": "play.israelmc.net"
-    },
-    {
       "name": "LoverCraft",
       "address": "play.loverfella.com"
     },
@@ -39,6 +35,15 @@
     {
       "name": "Israel Practice",
       "address": "play.israelpractice.net"
+    },
+    {
+      "name": "oskarSMP",
+      "address": "oskarsmp.ddns.net",
+      "port": 25587
+    },
+    {
+      "name": "Sixpy",
+      "address": "sixpy.dpdns.org"
     }
   ],
   "hytale": []
