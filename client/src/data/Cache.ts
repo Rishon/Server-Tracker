@@ -11,7 +11,12 @@ export function getCache(key: string) {
     return null;
   }
 
-  return JSON.parse(cachedData);
+  try {
+    return JSON.parse(cachedData);
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
 }
 
 /**
