@@ -339,10 +339,6 @@ class StatusChecker {
   public async refreshAllServers() {
     await this.fetchServersData("minecraft");
     await this.fetchServersData("hytale");
-
-    const allServers = [...serversList.minecraft, ...serversList.hytale];
-
-    await MongoDB.removeInvalidServers(allServers);
   }
 
   public getServersData() {

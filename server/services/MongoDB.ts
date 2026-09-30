@@ -70,6 +70,9 @@ class MongoService {
     // Update port
     if (port != 25565 && port != 5520) server.port = port;
 
+    const dayAgo = Number(currentDateTime) - 1000 * 60 * 60 * 24;
+    server.ping = server.ping.filter((p) => Number(p.timestamp) >= dayAgo);
+
     server.ping.push({
       currentPlayers: currentPlayers,
       timestamp: currentDateTime,
@@ -154,15 +157,6 @@ class MongoService {
       server.totalPlayers = currentPlayers;
 
     await server.save();
-  }
-
-  // Delete servers that are not in the servers list
-  static async removeInvalidServers(serversList: Array<{ address: string }>) {
-    const validAddresses = new Set(serversList.map((s) => s.address));
-
-    await ServerModel.deleteMany({
-      address: { $nin: [...validAddresses] },
-    });
   }
 
   static async getServerData(address: String) {

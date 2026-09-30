@@ -25,7 +25,7 @@ interface IServer extends Document {
 
 const serverSchema: Schema = new Schema({
   name: { type: String, required: true },
-  address: { type: String, required: true },
+  address: { type: String, required: true, unique: true },
   port: { type: Number, required: false },
   maxPlayers: { type: Number, required: true },
   totalPlayers: { type: Number, required: false },
