@@ -38,10 +38,6 @@
       "port": 25587
     },
     {
-      "name": "Balonzo",
-      "address": "play.balonzo.net"
-    },
-    {
       "name": "OnlyGood",
       "address": "only-good.xyz"
     },
