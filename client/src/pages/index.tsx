@@ -32,6 +32,7 @@ type ServerData = {
     averagePlayers: number;
   }>;
   version?: string;
+  zeraphProtected?: boolean;
 };
 
 type ServersData = {
@@ -148,6 +149,7 @@ export default function Home() {
                   last24hAveragePlayers={server.last24hAveragePlayers}
                   allTimeAveragePlayers={server.allTimeAveragePlayers}
                   version={server.version}
+                  zeraphProtected={server.zeraphProtected}
                 />
               ))}
             </div>

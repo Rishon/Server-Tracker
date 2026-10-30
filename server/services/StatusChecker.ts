@@ -10,6 +10,7 @@ import { query } from "@hytaleone/query";
 
 // Utils
 import { getFallbackHytaleImage, getFallbackMCImage } from "../utils/ImageData";
+import { isZeraphProtected } from "../utils/ZeraphDetector";
 
 // Interfaces
 interface ServerData {
@@ -232,6 +233,7 @@ class StatusChecker {
       allTimeAveragePlayers: mongoServer.allTimeAveragePlayers,
       dailyMetrics: mongoServer.dailyMetrics,
       version: info.version,
+      zeraphProtected: await isZeraphProtected(server.address),
     };
   }
 

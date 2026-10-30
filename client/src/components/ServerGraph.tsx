@@ -9,6 +9,7 @@ import { FaCopy } from "react-icons/fa";
 
 // Components
 import Snackbar from "@/components/Snackbar";
+import { ZeraphMark } from "@/components/ZeraphMark";
 import MotdTranslate from "./utils/MotdTranslate";
 
 export default function ServerGraph({
@@ -27,6 +28,7 @@ export default function ServerGraph({
   last24hAveragePlayers,
   allTimeAveragePlayers,
   version,
+  zeraphProtected,
 }: Readonly<{
   isOnline: boolean;
   image: string;
@@ -43,6 +45,7 @@ export default function ServerGraph({
   last24hAveragePlayers?: number;
   allTimeAveragePlayers?: number;
   version?: string;
+  zeraphProtected?: boolean;
 }>) {
   const maxPings = 1440;
 
@@ -220,6 +223,18 @@ export default function ServerGraph({
         <div className="ml-3 -mt-1 min-w-0 flex-1 pr-14 sm:pr-16">
           <h1 className="text-md font-semibold text-gray-300 flex items-center gap-2 min-w-0">
             <span className="min-w-0 truncate">{name}</span>
+            {zeraphProtected && (
+              <a
+                href="https://zeraph.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Protected by Zeraph"
+                aria-label="Protected by Zeraph"
+                className="shrink-0 flex items-center rounded-md bg-[#d9915c]/10 p-1 text-[#d9915c] transition-colors hover:bg-[#d9915c]/20"
+              >
+                <ZeraphMark size={12} />
+              </a>
+            )}
             {version && (
               <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-md bg-[#2f2f2f] text-gray-400 font-medium">
                 {cleanVersion(version)}

@@ -5,19 +5,14 @@ import { usePathname } from "next/navigation";
 
 // React
 import { useEffect, useState } from "react";
-import {
-  HiCog6Tooth,
-  HiClock,
-  HiUsers,
-  HiXMark,
-  HiShieldCheck,
-} from "react-icons/hi2";
+import { HiCog6Tooth, HiClock, HiUsers, HiXMark } from "react-icons/hi2";
 
 // Cache
 import { setCache, getCache } from "@/data/Cache";
 
 // Components
 import Snackbar from "@/components/Snackbar";
+import { ZeraphMark } from "@/components/ZeraphMark";
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
 // Context
@@ -140,10 +135,13 @@ const Navbar = () => {
               target="_blank"
               className="group flex items-center gap-2 rounded-xl border border-white/10
               bg-white/5 px-3.5 py-2 text-sm font-medium text-gray-300
-              transition-all duration-200 hover:border-[#f0cd31]/30
+              transition-all duration-200 hover:border-[#d9915c]/30
               hover:bg-white/10 hover:text-white active:scale-95"
             >
-              <HiShieldCheck className="text-base text-[#f0cd31] transition-transform duration-200 group-hover:scale-110" />
+              <ZeraphMark
+                size={16}
+                className="text-[#d9915c] transition-transform duration-200 group-hover:scale-110"
+              />
               <span>Protect your server</span>
             </Link>
           </div>
@@ -236,7 +234,7 @@ const Navbar = () => {
                   >
                     <Image
                       src="/assets/games/minecraft.webp"
-                      width={16}
+                      width={15}
                       height={16}
                       alt="Minecraft"
                       className="mr-2"
@@ -256,7 +254,7 @@ const Navbar = () => {
                   >
                     <Image
                       src="/assets/games/hytale.webp"
-                      width={16}
+                      width={15}
                       height={16}
                       alt="Hytale"
                       className="mr-2"
