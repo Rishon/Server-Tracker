@@ -1,21 +1,35 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
+import { useRouter } from "next/router";
 
-type CurrentList = "minecraft" | "hytale";
+import { Game, gamePath } from "@/data/Servers";
 
 type CurrentListContextType = {
-  currentList: CurrentList;
-  setCurrentList: React.Dispatch<React.SetStateAction<CurrentList>>;
+  currentList: Game;
+  setCurrentList: (list: Game) => void;
 };
 
 const CurrentListContext = createContext<CurrentListContextType | undefined>(
   undefined,
 );
 
-export const CurrentListProvider = ({ children }: { children: ReactNode }) => {
-  const [currentList, setCurrentList] = useState<CurrentList>("minecraft");
+export const CurrentListProvider = ({
+  game,
+  children,
+}: {
+  game?: Game;
+  children: ReactNode;
+}) => {
+  const router = useRouter();
+
+  const setCurrentList = (list: Game) => {
+    const path = gamePath(list);
+    if (router.asPath !== path) router.push(path);
+  };
 
   return (
-    <CurrentListContext.Provider value={{ currentList, setCurrentList }}>
+    <CurrentListContext.Provider
+      value={{ currentList: game ?? "minecraft", setCurrentList }}
+    >
       {children}
     </CurrentListContext.Provider>
   );

@@ -1,31 +1,38 @@
 // Next.js
 import Head from "next/head";
-import Script from "next/script";
-
-// Components
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CookieBanner from "@/components/CookieBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
   seo?: {
     title?: string;
     description?: string;
-    image?: string;
+    path?: string;
   };
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_HOSTNAME;
+const SITE_NAME = "Server Tracker";
+const DEFAULT_DESCRIPTION =
+  "Live player counts, MOTDs, 24-hour graphs and uptime for Minecraft and Hytale servers.";
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: DEFAULT_DESCRIPTION,
+  publisher: {
+    "@type": "Organization",
+    name: "Sela Development",
+  },
+});
+
 const RootLayout = ({ children, seo }: LayoutProps) => {
-  const domain = process.env.NEXT_PUBLIC_HOSTNAME;
-
-  const fallbackTitle = "Server Tracker";
-  const fallbackDescription =
-    "Live tracking of player counts, MOTDs, and historical uptime.";
-
-  const title = seo?.title ? `${seo.title} | Server Tracker` : fallbackTitle;
-  const description = seo?.description || fallbackDescription;
-  const image = seo?.image;
+  const title = seo?.title ? `${seo.title} | ${SITE_NAME}` : SITE_NAME;
+  const description = seo?.description || DEFAULT_DESCRIPTION;
+  const url =
+    seo?.path && seo.path !== "/" ? `${SITE_URL}${seo.path}` : SITE_URL;
+  const image = `${SITE_URL}/assets/og.png`;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -33,16 +40,19 @@ const RootLayout = ({ children, seo }: LayoutProps) => {
         <title>{title}</title>
         <meta name="description" content={description} />
         <meta name="author" content="Rishon" />
-        <meta name="keywords" content="Tracker, Minecraft, Israel, Servers" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#FFFFFF" />
+        <meta name="theme-color" content="#0f0f10" />
 
         {/* OpenGraph / Social Media */}
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
+        <meta property="og:url" content={url} />
         <meta property="og:image" content={image} />
-        {domain && <meta property="og:url" content={`https://${domain}`} />}
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={SITE_NAME} />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -50,43 +60,19 @@ const RootLayout = ({ children, seo }: LayoutProps) => {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={image} />
 
-        <link rel="canonical" href={domain} />
+        <link rel="canonical" href={url} />
         <link rel="icon" href="/assets/favicon.ico" />
+
+        <script
+          key="json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLd }}
+        />
       </Head>
 
-      {/* JSON-LD Structured Data */}
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            url: domain,
-            name: "Server Tracker",
-            author: {
-              "@type": "Organization",
-              name: "Sela Development",
-            },
-            description: "Track Minecraft servers",
-            potentialAction: {
-              "@type": "SearchAction",
-              target: `https://${domain}/search?q={search_term_string}`,
-              "query-input": "required name=search_term_string",
-            },
-          }),
-        }}
-      />
-
-      <main className="bg-black-gray-dots bg-dots-pattern min-h-screen">
-        <Navbar />
+      <div className="bg-black-gray-dots bg-dots-pattern min-h-screen">
         {children}
-        <Footer />
-      </main>
-
-      {/* Cookie Banner & Analytics */}
-      <CookieBanner />
+      </div>
     </div>
   );
 };

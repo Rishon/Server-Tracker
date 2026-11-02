@@ -1,7 +1,11 @@
 // Next.js
 import Link from "next/link";
 
+import { useConsent } from "@/contexts/ConsentContext";
+
 const Footer = () => {
+  const { openBanner } = useConsent();
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-[#0f0f10] p-3 border-t border-[#2f2f2f] z-20 flex items-center justify-center">
       <div className="flex items-center justify-between flex-wrap">
@@ -10,12 +14,19 @@ const Footer = () => {
           <code className="text-sm text-gray-400 text-center lg:text-left items-center lg:justify-center flex flex-col lg:flex-row">
             <span className="mb-2 lg:mb-0">Server Tracker</span>
             <span className="lg:border-l lg:border-gray-400 lg:mx-2 lg:h-2.5 lg:inline-block"></span>
-            <span>
+            <span className="mb-2 lg:mb-0">
               Made with <span className="text-red">❤️</span> by{" "}
               <Link href="https://rishon.systems" target="_blank">
                 rishon.systems
               </Link>
             </span>
+            <span className="lg:border-l lg:border-gray-400 lg:mx-2 lg:h-2.5 lg:inline-block"></span>
+            <button
+              onClick={openBanner}
+              className="transition-colors hover:text-white"
+            >
+              Cookie settings
+            </button>
           </code>
         </div>
       </div>

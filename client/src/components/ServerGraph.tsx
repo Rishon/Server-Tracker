@@ -1,5 +1,6 @@
 // Next.js
 import Image from "next/image";
+import Link from "next/link";
 
 // React
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
@@ -12,7 +13,10 @@ import Snackbar from "@/components/Snackbar";
 import { ZeraphMark } from "@/components/ZeraphMark";
 import MotdTranslate from "./utils/MotdTranslate";
 
+import { trackEvent } from "@/data/Analytics";
+
 export default function ServerGraph({
+  href,
   isOnline,
   image,
   motd,
@@ -30,6 +34,7 @@ export default function ServerGraph({
   version,
   zeraphProtected,
 }: Readonly<{
+  href?: string;
   isOnline: boolean;
   image: string;
   motd: string;
@@ -62,7 +67,7 @@ export default function ServerGraph({
   };
 
   // Motd
-  const [motdMessage, setMotdMessage] = useState<string>("");
+  const [motdMessage, setMotdMessage] = useState<string>(motd);
 
   // Hover state
   const [hoverX, setHoverX] = useState<number | null>(null);
@@ -207,10 +212,13 @@ export default function ServerGraph({
         <div className="absolute right-4 top-4 flex flex-row gap-2 flex-nowrap">
           <button
             className="text-lg sm:text-xl text-gray-400 hover:text-gray-300 focus:outline-none border border-gray-700 hover:border-gray-500 rounded-md p-2 sm:p-3 hover:bg-[#2f2f2f] focus:bg-[#2f2f2f] transition-all duration-200 ease-in-out hover:shadow-lg"
+            aria-label={`Copy ${name} server address`}
+            title="Copy server address"
             onClick={() => {
               navigator.clipboard.writeText(
                 `${ipAddress}${port ? `:${port}` : ""}`,
               );
+              trackEvent("copy_ip", { server_name: name });
               setNotification("Copied to clipboard!");
               setSnackbarType("success");
               setShowSnackbar(true);
@@ -221,13 +229,25 @@ export default function ServerGraph({
         </div>
 
         <div className="ml-3 -mt-1 min-w-0 flex-1 pr-14 sm:pr-16">
-          <h1 className="text-md font-semibold text-gray-300 flex items-center gap-2 min-w-0">
-            <span className="min-w-0 truncate">{name}</span>
+          <h2 className="text-md font-semibold text-gray-300 flex items-center gap-2 min-w-0">
+            {href ? (
+              <Link
+                href={href}
+                className="min-w-0 truncate transition-colors hover:text-white"
+              >
+                {name}
+              </Link>
+            ) : (
+              <span className="min-w-0 truncate">{name}</span>
+            )}
             {zeraphProtected && (
               <a
                 href="https://zeraph.app"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent("zeraph_click", { location: "server_card" })
+                }
                 title="Protected by Zeraph"
                 aria-label="Protected by Zeraph"
                 className="shrink-0 flex items-center rounded-md bg-[#d9915c]/10 p-1 text-[#d9915c] transition-colors hover:bg-[#d9915c]/20"
@@ -240,7 +260,7 @@ export default function ServerGraph({
                 {cleanVersion(version)}
               </span>
             )}
-          </h1>
+          </h2>
           <p className="text-md text-gray-500 truncate">
             {ipAddress}
             {port ? `:${port}` : ""}

@@ -10,7 +10,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/third-parties": "^16.4.3",
     "next": "^16.4.3",
     "next-sitemap": "^4.2.3",
     "react": "^19.3.1",

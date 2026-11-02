@@ -75,7 +75,8 @@ jobs:
             bun install
             rm -f .env
             echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" > .env
-            bunx next build
+            echo "API_URL_INTERNAL=http://localhost:${{ secrets.BACKEND_PORT }}" >> .env
+            bun run build
 
             cd ../server
             bun install

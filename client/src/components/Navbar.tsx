@@ -20,6 +20,8 @@ import { useGraphColor } from "@/contexts/GraphColorContext";
 import { useCurrentList } from "@/contexts/CurrentListContext";
 import { useSortBy } from "@/contexts/SortByContext";
 
+import { trackEvent } from "@/data/Analytics";
+
 const Navbar = () => {
   // Navigation
   const currentPage = usePathname();
@@ -50,6 +52,7 @@ const Navbar = () => {
       path: "https://github.com/Rishon/Server-Tracker/blob/master/server/servers.json",
       label: "Suggest Server",
       target: "_blank",
+      onClick: () => trackEvent("suggest_server_click"),
     },
   ];
 
@@ -82,7 +85,7 @@ const Navbar = () => {
   }
 
   return (
-    <main>
+    <header>
       {showSnackbar && (
         <Snackbar
           message={notification || ""}
@@ -116,6 +119,7 @@ const Navbar = () => {
                 key={link.path}
                 href={link.path}
                 target={link.target}
+                onClick={link.onClick}
                 className={`relative text-sm font-medium transition-colors
             ${
               currentPage === link.path
@@ -133,6 +137,7 @@ const Navbar = () => {
             <Link
               href="https://zeraph.app"
               target="_blank"
+              onClick={() => trackEvent("zeraph_click", { location: "navbar" })}
               className="group flex items-center gap-2 rounded-xl border border-white/10
               bg-white/5 px-3.5 py-2 text-sm font-medium text-gray-300
               transition-all duration-200 hover:border-[#d9915c]/30
@@ -221,6 +226,7 @@ const Navbar = () => {
                   <button
                     onClick={() => {
                       setCurrentList("minecraft");
+                      trackEvent("select_game", { game: "minecraft" });
                       sendSnackbar(
                         "Minecraft server list selected!",
                         "success",
@@ -244,6 +250,7 @@ const Navbar = () => {
                   <button
                     onClick={() => {
                       setCurrentList("hytale");
+                      trackEvent("select_game", { game: "hytale" });
                       sendSnackbar("Hytale server list selected!", "success");
                     }}
                     className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
@@ -274,6 +281,7 @@ const Navbar = () => {
                   {graphColors.map((color) => (
                     <button
                       key={color}
+                      aria-label={`Set graph color to ${color}`}
                       className={`h-9 w-9 rounded-full transition-all duration-200 ease-out hover:scale-110 active:scale-95
                         ${color === graphColor ? "ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0a]" : ""}`}
                       style={{ backgroundColor: color }}
@@ -311,7 +319,10 @@ const Navbar = () => {
                 </h4>
                 <div className="flex w-full items-center justify-between overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1 shadow-inner">
                   <button
-                    onClick={() => setSortBy("players")}
+                    onClick={() => {
+                      setSortBy("players");
+                      trackEvent("change_sort", { sort_by: "players" });
+                    }}
                     className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
                       sortBy === "players"
                         ? "bg-white text-black shadow-sm"
@@ -322,7 +333,10 @@ const Navbar = () => {
                     Players
                   </button>
                   <button
-                    onClick={() => setSortBy("uptime")}
+                    onClick={() => {
+                      setSortBy("uptime");
+                      trackEvent("change_sort", { sort_by: "uptime" });
+                    }}
                     className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 ${
                       sortBy === "uptime"
                         ? "bg-white text-black shadow-sm"
@@ -338,7 +352,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </main>
+    </header>
   );
 };
 
