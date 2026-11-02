@@ -70,15 +70,7 @@ export default function ServerList({ game, initialServers }: ServerListProps) {
           game === "hytale" ? "pt-56 sm:pt-40" : "pt-36 sm:pt-32"
         }`}
       >
-        <div className="px-4">
-          <h1 className="text-xl font-semibold text-gray-200">{heading}</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Live player counts, MOTDs and uptime
-            {visibleServers.length > 0 &&
-              ` for ${visibleServers.length} ${label} servers`}
-            , updated every minute.
-          </p>
-        </div>
+        <h1 className="sr-only">{heading}</h1>
 
         {visibleServers.length === 0 ? (
           <div className="text-center text-gray-400 py-12">
