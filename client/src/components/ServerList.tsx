@@ -60,7 +60,7 @@ export default function ServerList({ game, initialServers }: ServerListProps) {
   return (
     <Layout
       seo={{
-        title: `${heading} – Live Player Counts`,
+        title: game === "minecraft" ? undefined : `${label} Servers`,
         description: `Live player counts, MOTDs, 24-hour graphs and uptime for Israeli ${label} servers, refreshed every minute. Find a server and copy its IP in one click.`,
         path: gamePath(game),
       }}
