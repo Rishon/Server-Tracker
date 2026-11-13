@@ -15,24 +15,23 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Cache Bun Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: |
-            **/node_modules
-            ~/.bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
 
       - name: Install Client Dependencies
         working-directory: client
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build Client
         working-directory: client
@@ -40,7 +39,7 @@ jobs:
 
       - name: Install Server Dependencies
         working-directory: server
-        run: bun install
+        run: bun install --frozen-lockfile
 
   deploy:
     name: Deploy to Server
@@ -49,11 +48,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
       - name: Deploy using SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -68,27 +64,16 @@ jobs:
             fi
 
             cd Server-Tracker
+            git fetch origin master
             git reset --hard origin/master
-            git pull origin master
 
-            cd client
-            bun install
-            rm -f .env
-            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" > .env
-            echo "API_URL_INTERNAL=http://localhost:${{ secrets.BACKEND_PORT }}" >> .env
-            bun run build
+            echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" > client/.env
+            echo "API_URL_INTERNAL=http://localhost:${{ secrets.BACKEND_PORT }}" >> client/.env
 
-            cd ../server
-            bun install
-            rm -f .env
-            echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > .env
-            echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> .env
+            echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" > server/.env
+            echo "MONGODB_URL=${{ secrets.MONGODB_URL }}" >> server/.env
+            chmod 600 server/.env
 
-            cd ..
-            docker build ./client -t tracker-web
-            docker build ./server -t tracker-server
-
-            docker container prune --force
+            docker compose build --pull
+            docker compose up -d --remove-orphans
             docker image prune --force
-
-            docker compose up -d

@@ -1,12 +1,23 @@
 services:
   tracker-web:
+    build:
+      context: ./client
+      network: host
     image: tracker-web
     container_name: tracker-web
+    env_file:
+      - path: ./client/.env
+        required: false
     restart: unless-stopped
     network_mode: host
 
   tracker-server:
+    build:
+      context: ./server
     image: tracker-server
     container_name: tracker-server
+    env_file:
+      - path: ./server/.env
+        required: false
     restart: unless-stopped
     network_mode: host

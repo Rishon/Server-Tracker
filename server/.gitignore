@@ -79,8 +79,6 @@ web_modules/
 
 .stylelintcache
 
-# bun
-bun.lock
 
 # Microbundle cache
 

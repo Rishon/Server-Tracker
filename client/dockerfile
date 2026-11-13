@@ -1,41 +1,28 @@
-FROM node:22-slim
+FROM oven/bun:1.4-slim AS bun
 
-# Environment variables
-ENV DEBIAN_FRONTEND=noninteractive \
-    PATH="/root/.bun/bin:${PATH}"
-
-ARG FRONTEND_PORT
-ENV FRONTEND_PORT=$FRONTEND_PORT
-
-# Install some basic tools
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    git \
-    unzip \
-    zip \
-    nano \
-    wget && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-    
-# Set the working directory
-COPY . /app
+FROM node:22-slim AS base
+ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 
-# Give the entrypoint.sh file the right permissions
-RUN chmod +x /app/entrypoint.sh
+FROM base AS deps
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+COPY package.json bun.lock ./
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile
 
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
+FROM base AS build
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bun run build
 
-# Add bun to PATH
-ENV BUN_INSTALL="/root/.bun"
-ENV PATH="$BUN_INSTALL/bin:$PATH"
+FROM base AS runner
+ENV NODE_ENV=production \
+    HOSTNAME=0.0.0.0
 
-# Expose the port
-EXPOSE ${FRONTEND_PORT}
+COPY --from=build --chown=node:node /app/public ./public
+COPY --from=build --chown=node:node /app/.next/standalone ./
+COPY --from=build --chown=node:node /app/.next/static ./.next/static
 
-# Install npm-packages & run the app
-ENTRYPOINT ["/app/entrypoint.sh"]
+USER node
+CMD ["sh", "-c", "PORT=\"${FRONTEND_PORT:-3006}\" exec node server.js"]

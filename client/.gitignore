@@ -20,8 +20,6 @@
 .DS_Store
 *.pem
 
-# bun
-bun.lock
 
 # debug
 npm-debug.log*

@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+
+.env*.local
+.env.development
+
+.git
+.gitignore
+.dockerignore
+dockerfile
+.eslintrc.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
