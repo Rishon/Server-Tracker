@@ -52,6 +52,27 @@
     {
       "name": "ShotistMC",
       "address": "play.shotist.net"
+    },
+    {
+      "name": "Coin Israel",
+      "address": "join.coinisrael.net"
+    },
+    {
+      "name": "ShalomCraft",
+      "address": "play.shalomcraft.net",
+      "port": 25571
+    },
+    {
+      "name": "Mel IL",
+      "address": " play.melil.net"
+    },
+    {
+      "name": "EarthCraftSMP",
+      "address": "earthcraft.secure.pebble.host"
+    },
+    {
+      "name": "Israel Legacy",
+      "address": "play.israellegacy.online"
     }
   ],
   "hytale": []
